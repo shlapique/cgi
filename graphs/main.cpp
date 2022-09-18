@@ -9,8 +9,50 @@ struct Point
     int y;
 };
 
+//midpoint circle algorithm
+void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius)
+{
+   SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+   const int32_t diameter = (radius * 2);
+
+   int32_t x = (radius - 1);
+   int32_t y = 0;
+   int32_t tx = 1;
+   int32_t ty = 1;
+   int32_t error = (tx - diameter);
+
+   while (x >= y)
+   {
+      //  Each of the following renders an octant of the circle
+      SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
+      SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
+      SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
+      SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
+      SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
+      SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
+      SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+      SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
+
+      if (error <= 0)
+      {
+         ++y;
+         error += ty;
+         ty += 2;
+      }
+
+      if (error > 0)
+      {
+         --x;
+         tx += 2;
+         error += (tx - diameter);
+      }
+   }
+}
+
 void draw_parabola(SDL_Renderer *renderer, int size_x, int size_y, Point origin, double prec)
 {
+    draw_circle(renderer, origin.x + (1 / prec), origin.y, 4);
+
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     double f;
     int x, y;
@@ -127,45 +169,6 @@ Point draw_coords(SDL_Renderer *renderer, int size_x, int size_y)
     return point;
 }
 
-//midpoint circle algorithm
-void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius)
-{
-   const int32_t diameter = (radius * 2);
-
-   int32_t x = (radius - 1);
-   int32_t y = 0;
-   int32_t tx = 1;
-   int32_t ty = 1;
-   int32_t error = (tx - diameter);
-
-   while (x >= y)
-   {
-      //  Each of the following renders an octant of the circle
-      SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
-      SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
-      SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
-      SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
-      SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
-      SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
-      SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
-      SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
-
-      if (error <= 0)
-      {
-         ++y;
-         error += ty;
-         ty += 2;
-      }
-
-      if (error > 0)
-      {
-         --x;
-         tx += 2;
-         error += (tx - diameter);
-      }
-   }
-}
-
 
 double dist(int x1, int y1, int x2, int y2)
 {
@@ -198,7 +201,7 @@ int main(int argc, char *argv[])
     int size_x = 640;
     int size_y = 480; 
     double a = 10;
-    unsigned int mult = 1;
+    double mult = 1;
 
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
     {
@@ -222,7 +225,8 @@ int main(int argc, char *argv[])
 
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  
                 Point point = draw_coords(renderer, size_x, size_y);
-                draw_graph(renderer, size_x, size_y, point, 0.001 * mult, a);
+                draw_parabola(renderer, size_x, size_y, point, (1 / (mult * 100)));
+                // draw_graph(renderer, size_x, size_y, point, 0.1 * mult, a);
 
                 SDL_RenderPresent(renderer);
 
@@ -237,20 +241,21 @@ int main(int argc, char *argv[])
                     {
                         if(event.wheel.y > 0) // scroll up
                         {
-                            if(mult - 1 >= 1)
+                            mult += 0.1;
+                            printf("Mult = %f\n", mult);
+                        }
+
+                        else if(event.wheel.y < 0) // scroll down
+                        {
+                            if(mult - 0.1 >= 0.1)
                             {
-                                mult -= 1;
-                                printf("Mult = %d\n", mult);
+                                mult -= 0.1;
+                                printf("Mult = %f\n", mult);
                             }
                             else
                             {
                                 printf("in minus field!\n");
                             }
-                        }
-                        else if(event.wheel.y < 0) // scroll down
-                        {
-                            mult += 1;
-                            printf("Mult = %d\n", mult);
                         }
                     }
                 }
