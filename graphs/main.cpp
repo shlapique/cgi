@@ -95,8 +95,8 @@ std::vector <std::vector <int>> parabola(int size_x, int size_y, Point origin, d
     for(int i = origin.x - size_x; i < size_x; ++i)
     {
         f = std::pow(i * prec, 2);
-        y = size_y - origin.y - (int)std::round(f * (1 / prec));
         x = origin.x + i;
+        y = size_y - origin.y - (int)std::round(f * (1 / prec));
         vec.push_back({x, y});
     }
     return vec;
@@ -229,35 +229,36 @@ int main(int argc, char *argv[])
 
                 SDL_RenderPresent(renderer);
 
-                while (SDL_PollEvent(&event)) 
+                while (SDL_PollEvent(&event))
                 {
-                    if (event.type == SDL_QUIT) 
+                    switch (event.type)
                     {
-                        done = SDL_TRUE;
-                    }
-                
-                    if (event.type == SDL_MOUSEWHEEL)
-                    {
-                        if(event.wheel.y > 0) // scroll up
-                        {
-                            mult += 0.1;
-                            printf("Mult = %f\n", mult);
-                        }
-
-                        else if(event.wheel.y < 0) // scroll down
-                        {
-                            if(mult - 0.1 >= 0.1)
+                        case SDL_QUIT:
+                            done = SDL_TRUE;
+                            break;
+                        case SDL_MOUSEWHEEL:
+                            if(event.wheel.y > 0) // scroll up
                             {
-                                mult -= 0.1;
+                                mult += 0.1;
                                 printf("Mult = %f\n", mult);
                             }
-                            else
+
+                            else if(event.wheel.y < 0) // scroll down
                             {
-                                printf("in minus field!\n");
+                                if(mult - 0.1 >= 0.1)
+                                {
+                                    mult -= 0.1;
+                                    printf("Mult = %f\n", mult);
+                                }
+                                else
+                                {
+                                    printf("in minus field!\n");
+                                }
                             }
-                        }
+                            break;                            
                     }
                 }
+                SDL_Delay(20);
             }
         }
 
