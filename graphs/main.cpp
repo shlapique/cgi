@@ -135,7 +135,7 @@ std::vector <std::vector <int>> flower(int size_x, int size_y, Point origin, dou
     return vec;
 }
 
-std::vector <std::vector <int>> graph(int size_x, int size_y, Point origin, double prec, double a)
+std::vector <std::vector <int>> cardioid(int size_x, int size_y, Point origin, double prec, double a)
 {
     std::vector <std::vector <int>> vec;
     double f;
@@ -150,17 +150,39 @@ std::vector <std::vector <int>> graph(int size_x, int size_y, Point origin, doub
     return vec;
 }
 
-Point draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec)
+
+Point origin(int size_x, int size_y)
 {
-    Point point;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(renderer, size_x / 2, 0, size_x / 2, size_y);
-    SDL_RenderDrawLine(renderer, 0, size_y / 2, size_x, size_y / 2);
-    point.x = size_x / 2;
-    point.y = size_y / 2; 
-    draw_circle(renderer, point.x + (1 / prec), point.y, 4);
+    Point point = {size_x / 2, size_y / 2};
     return point;
 }
+
+
+void draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec, Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    
+    for(int i = 1; i < size_x; i += 1 / prec)
+    {
+        draw_circle(renderer, origin(size_x, size_y).x + i, origin(size_x, size_y).y, 4);
+        draw_circle(renderer, origin(size_x, size_y).x - i, origin(size_x, size_y).y, 4);
+    }
+
+    for(int j = 1; j < size_y; j += 1 / prec)
+    {
+        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y - j, 4);
+        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y + j, 4);
+    }
+
+    /*
+    printf("x_counter = %d, y_counter = %d\n", x_counter, y_counter);
+    printf("count_x = %d, count_y = %d\n", count_x, count_y);
+    */
+
+    SDL_RenderDrawLine(renderer, size_x / 2, 0, size_x / 2, size_y);
+    SDL_RenderDrawLine(renderer, 0, size_y / 2, size_x, size_y / 2);
+}
+
 
 
 double dist(int x1, int y1, int x2, int y2)
@@ -179,15 +201,6 @@ void draw_triangle(SDL_Renderer *renderer, int x, int y, int ts)
     SDL_RenderDrawLine(renderer, x + ts / 2, y + ts / 2, x - ts / 2, y + ts / 2);
 }
 
-// later would be in "update screen" class
-void draw_triangle(SDL_Renderer *renderer, int x, int y, int ts, unsigned int mult)
-{
-    ts *= mult;
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderDrawLine(renderer, x - ts / 2, y + ts / 2, x, y - ts / 2);
-    SDL_RenderDrawLine(renderer, x, y - ts / 2, x + ts / 2, y + ts / 2);
-    SDL_RenderDrawLine(renderer, x + ts / 2, y + ts / 2, x - ts / 2, y + ts / 2);
-}
 
 int main(int argc, char *argv[])
 {
@@ -196,6 +209,7 @@ int main(int argc, char *argv[])
     double a = 10;
     double mult = 1;
     Color color = {231, 222, 111};
+    Color coord_color = {2, 0, 200};
 
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
     {
@@ -210,6 +224,7 @@ int main(int argc, char *argv[])
                 SDL_Event event;
                 int x, y;
                 Uint32 buttons;
+
                 SDL_PumpEvents();  // make sure we have the latest mouse state.
                 buttons = SDL_GetMouseState(&x, &y);
                 SDL_GetWindowSize(window, &size_x, &size_y);
@@ -218,10 +233,11 @@ int main(int argc, char *argv[])
                 SDL_RenderClear(renderer); 
 
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  
-                Point point = draw_coords(renderer, size_x, size_y, 1 / (mult * 100));
+                Point point = origin(size_x, size_y);
+                draw_coords(renderer, size_x, size_y, 1 / (mult * 100), coord_color);
 
                 ////
-                draw(renderer, graph(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
+                draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 draw(renderer, flower(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
                 draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
