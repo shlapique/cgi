@@ -2,13 +2,17 @@
 
 To perform everything i use SDL2
 
-### required dependencies 
+### openSUSE Tumbleweed 
 ```bash
 sudo zypper in libSDL2-2_0-0 SDL2-devel SDL2_ttf-devel
 ```
 
-### how to use?
+### Fedora 36
+```bash
+sudo dnf install SDL2 SDL2-devel SDL2_ttf SDL2_ttf-devel
+```
 
+### how to use?
 ```bash
 make all
 ```
