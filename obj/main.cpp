@@ -21,11 +21,12 @@ struct Color
 };
 
 
-struct Object
+enum Axis 
 {
-
+    X, 
+    Y, 
+    Z
 };
-
 
 Point polar_to_dec(double ro, double phi)
 {
@@ -88,6 +89,27 @@ void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
     SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
 }
 
+void draw_cube(SDL_Renderer *renderer, Point cube[], Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    for(int i = 0; i < 3; ++i)
+    {
+        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 1].x, cube[i + 1].y);
+    }
+    SDL_RenderDrawLine(renderer, cube[0].x, cube[0].y, cube[3].x, cube[3].y);
+
+    for(int i = 4; i < 7; ++i)
+    {
+        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 1].x, cube[i + 1].y);
+    }
+    SDL_RenderDrawLine(renderer, cube[4].x, cube[4].y, cube[7].x, cube[7].y);
+
+    for(int i = 0; i < 4; ++i)
+    {
+        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 4].x, cube[i + 4].y);
+    }
+
+}
 
 //screen center
 Point find_origin(int size_x, int size_y, double k)
@@ -96,34 +118,31 @@ Point find_origin(int size_x, int size_y, double k)
     return point;
 }
 
-void draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec, Color color)
-{
 
-}
-
-Point rotate_x(Point a, double phi)
+// Where dir = 1 or -1
+Point rotate_x(Point a, double phi, int dir)
 {
     Point result;
     result.x = a.x;
-    result.y = a.y * std::cos(phi) - a.z * std::sin(phi);
-    result.z = a.y * std::sin(phi) + a.z * std::cos(phi);
+    result.y = a.y * std::cos(phi) - dir * a.z * std::sin(phi);
+    result.z = dir * a.y * std::sin(phi) + a.z * std::cos(phi);
     return result;
 }
 
-Point rotate_y(Point a, double phi)
+Point rotate_y(Point a, double phi, int dir)
 {
     Point result;
-    result.x = a.x * std::cos(phi) + a.z * std::sin(phi);
+    result.x = a.x * std::cos(phi) + dir * a.z * std::sin(phi);
     result.y = a.y;
-    result.z = -a.x * std::sin(phi) + a.z * std::cos(phi);
+    result.z = -dir * a.x * std::sin(phi) + a.z * std::cos(phi);
     return result;
 }
 
-Point rotate_z(Point a, double phi)
+Point rotate_z(Point a, double phi, int dir)
 {
     Point result;
-    result.x = a.x * std::cos(phi) - a.y * std::sin(phi);
-    result.y = a.x * std::sin(phi) + a.y * std::cos(phi);
+    result.x = a.x * std::cos(phi) - dir * a.y * std::sin(phi);
+    result.y = dir * a.x * std::sin(phi) + a.y * std::cos(phi);
     result.z = a.z;
     return result;
 }
@@ -170,29 +189,25 @@ int main(int argc, char *argv[])
     int size_x = 640;
     int size_y = 480; 
     double mult = 0;
-    double mult_tmp = 0;
+    int dir = 1; //default for my SC is clockwise (oZ looks away from me)
+    Axis axis; // to change axis of rotation
 
     /// default distance (k) from proj to screen
-    int k = 150;
-    /// points for segment
-    Point a = {-100, 0, 10};
-    Point b = {100, 0, 10};
+    int k = 600;
 
-    Point pa;
-    Point pb;
-
-    Point ra;
-    Point rb;
-
-    printf("a.x = %f, a.y = %f\n", a.x, a.y);
-
+    /// points for cube
+    Point cube[8] = {{100, 100, -100}, {100, 100, 100}, {-100, 100, 100}, {-100, 100, -100},
+                    {100, -100, -100}, {100, -100, 100}, {-100, -100, 100}, {-100, -100, -100}};
+    
+    Point pcube[8];
+    Point rcube[8];
     ///
 
     //find center (origin)
     Point origin = find_origin(size_x, size_y, k);
 
     Color color = {231, 222, 111};
-    Color coord_color = {2, 0, 200};
+    //Color coord_color = {2, 0, 200};
     
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
     {
@@ -214,29 +229,46 @@ int main(int argc, char *argv[])
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
                 SDL_RenderClear(renderer); 
 
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  
-
 
                 ///
-                //printf("a.x = %f, a.y = %f\n", a.x, a.y);
-
-                if(mult != mult_tmp)
+                for(int i = 0; i < 8; ++i)
                 {
-                    printf("!!!!!!!!!!!a.x = %f, a.y = %f\n", a.x, a.y);
-                    a = rotate_x(a, mult);
-                    b = rotate_x(b, mult);
-                    mult_tmp = mult;
-                    printf("math a = (%f, %f, %f), b = (%f, %f, %f)\n", a.x, a.y, a.z, b.x, b.y, b.z); 
+                    switch(axis)
+                    {
+                        case X:
+                            cube[i] = rotate_x(cube[i], mult, dir); 
+                            if(mult != 0)
+                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                            break;
 
-                    pa = central_projection(a, k);
-                    pb = central_projection(b, k);
+                        case Y:
+                            cube[i] = rotate_y(cube[i], mult, dir); 
+                            if(mult != 0)
+                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                            break;
 
-                    ra = real_point(origin, pa);
-                    rb = real_point(origin, pb);
+                        case Z:
+                            cube[i] = rotate_z(cube[i], mult, dir); 
+                            if(mult != 0)
+                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                ///
+                mult = 0;
 
-                draw_segment(renderer, ra, rb, color);
+                for(int i = 0; i < 8; ++i)
+                {
+                    pcube[i] = central_projection(cube[i], k);    
+                }
+                    
+                for(int i = 0; i < 8; ++i)
+                {
+                    rcube[i] = real_point(origin, pcube[i]);    
+                }
+                draw_cube(renderer, rcube, color);
+                ///
 
 
                 SDL_RenderPresent(renderer);
@@ -250,22 +282,52 @@ int main(int argc, char *argv[])
                         case SDL_MOUSEWHEEL:
                             if(event.wheel.y > 0) // scroll up
                             {
-                                mult += 0.01;
-                                printf("Mult = %f\n", mult);
+                                dir = 1;
+                                axis = Z;
+                                mult += 0.05;
                             }
                             else if(event.wheel.y < 0) // scroll down
                             {
-                                if(mult - 0.01 >= 0.01)
-                                {
-                                    mult -= 0.01;
-                                    printf("Mult = %f\n", mult);
-                                }
-                                else
-                                {
-                                    printf("in minus field!\n");
-                                }
+                                dir = -1;
+                                axis = Z;
+                                mult += 0.05;
                             }
                             break;                            
+
+                        case SDL_KEYDOWN:
+                            switch(event.key.keysym.sym)
+                            {
+                                // SDLK_UP
+                                case SDLK_k:
+                                    dir = 1;
+                                    axis = X;
+                                    mult += 0.05;
+                                    break;
+                                
+                                // SDLK_DOWN
+                                case SDLK_j:
+                                    dir = -1;
+                                    axis = X;
+                                    mult += 0.05;
+                                    break;
+
+                                // SDLK_LEFT
+                                case SDLK_h:
+                                    dir = 1;
+                                    axis = Y;
+                                    mult += 0.05;
+                                    break;
+
+                                // SDLK_RIGHT
+                                case SDLK_l:
+                                    dir = -1;
+                                    axis = Y;
+                                    mult += 0.05;
+                                    break;
+
+                                default:
+                                    break;
+                            }
                     }
                 }
                 SDL_Delay(20);
