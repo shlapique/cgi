@@ -4,7 +4,7 @@ To perform everything i use SDL2
 
 ### openSUSE Tumbleweed 
 ```bash
-sudo zypper in libSDL2-2_0-0 SDL2-devel SDL2_ttf-devel
+sudo zypper in libSDL2-2_0-0 SDL2-devel
 ```
 
 ### Fedora 36
