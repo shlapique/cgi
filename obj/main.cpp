@@ -111,6 +111,13 @@ void draw_cube(SDL_Renderer *renderer, Point cube[], Color color)
 
 }
 
+void transform(Point obj[], int n, double k)
+{
+    for(int i = 0; i < n; ++i)
+    {
+        obj[i] = {obj[i].x * k, obj[i].y * k, obj[i].z * k};
+    }
+}
 //screen center
 Point find_origin(int size_x, int size_y, double k)
 {
@@ -190,7 +197,10 @@ int main(int argc, char *argv[])
     int size_y = 480; 
     double mult = 0;
     int dir = 1; //default for my SC is clockwise (oZ looks away from me)
-    Axis axis; // to change axis of rotation
+    Axis axis = X; // to change axis of rotation
+    double scale = 1; // size of obj in "times"
+    double scale_time = 1;
+
 
     /// default distance (k) from proj to screen
     int k = 600;
@@ -203,8 +213,6 @@ int main(int argc, char *argv[])
     Point rcube[8];
     ///
 
-    //find center (origin)
-    Point origin = find_origin(size_x, size_y, k);
 
     Color color = {231, 222, 111};
     //Color coord_color = {2, 0, 200};
@@ -229,6 +237,8 @@ int main(int argc, char *argv[])
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
                 SDL_RenderClear(renderer); 
 
+                //find center (origin)
+                Point origin = find_origin(size_x, size_y, k);
 
                 ///
                 for(int i = 0; i < 8; ++i)
@@ -237,18 +247,24 @@ int main(int argc, char *argv[])
                     {
                         case X:
                             cube[i] = rotate_x(cube[i], mult, dir); 
+                            pcube[i] = central_projection(cube[i], k);    
+                            rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
                             break;
 
                         case Y:
                             cube[i] = rotate_y(cube[i], mult, dir); 
+                            pcube[i] = central_projection(cube[i], k);    
+                            rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
                             break;
 
                         case Z:
                             cube[i] = rotate_z(cube[i], mult, dir); 
+                            pcube[i] = central_projection(cube[i], k);    
+                            rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
                             break;
@@ -257,16 +273,6 @@ int main(int argc, char *argv[])
                     }
                 }
                 mult = 0;
-
-                for(int i = 0; i < 8; ++i)
-                {
-                    pcube[i] = central_projection(cube[i], k);    
-                }
-                    
-                for(int i = 0; i < 8; ++i)
-                {
-                    rcube[i] = real_point(origin, pcube[i]);    
-                }
                 draw_cube(renderer, rcube, color);
                 ///
 
@@ -282,15 +288,29 @@ int main(int argc, char *argv[])
                         case SDL_MOUSEWHEEL:
                             if(event.wheel.y > 0) // scroll up
                             {
-                                dir = 1;
-                                axis = Z;
-                                mult += 0.05;
+                                if(scale_time + 0.1 <= 3)
+                                {
+                                    scale += 0.1;
+                                    scale_time += 0.1;
+                                    transform(cube, 8, scale);
+                                    printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
+                                    scale = 1;
+                                }
                             }
                             else if(event.wheel.y < 0) // scroll down
                             {
-                                dir = -1;
-                                axis = Z;
-                                mult += 0.05;
+                                if(scale_time - 0.1 >= 0.1)
+                                {
+                                    scale -= 0.1;
+                                    scale_time -= 0.1;
+                                    transform(cube, 8, scale);
+                                    printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
+                                    scale = 1;
+                                }
+                                else
+                                {
+                                    printf("SCALE arg is < 0.1!!!\n");
+                                }
                             }
                             break;                            
 
@@ -322,6 +342,18 @@ int main(int argc, char *argv[])
                                 case SDLK_l:
                                     dir = -1;
                                     axis = Y;
+                                    mult += 0.05;
+                                    break;
+
+                                case SDLK_u:
+                                    dir = 1;
+                                    axis = Z;
+                                    mult += 0.05;
+                                    break;
+
+                                case SDLK_d:
+                                    dir = -1;
+                                    axis = Z;
                                     mult += 0.05;
                                     break;
 
