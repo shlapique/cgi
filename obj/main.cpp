@@ -133,34 +133,109 @@ void draw_cube(SDL_Renderer *renderer, Point cube[], Color color)
 
 V4 plane_equation(Point p1, Point p2, Point p3)
 {
-    V4 result;
     // + - +
     p2 = {p2.x - p1.x, p2.y - p1.y, p2.z - p1.z};
     p3 = {p3.x - p1.x, p3.y - p1.y, p3.z - p1.z};
     p1 = {-p1.x, -p1.y, -p1.z};
 
-    Point prelast = {(p2.y * p3.z - p3.y * p2.z), (p2.x * p3.z - p3.x * p2.z), (p2.x * p3.y - p3.x * p2.y)}; 
-    result = {prelast.x, -prelast.y, prelast.z, p1.x * prelast.x + (-1) * p1.y * prelast.y + p1.z * prelast.z};
+    Point minors= {(p2.y * p3.z - p3.y * p2.z), (p2.x * p3.z - p3.x * p2.z), (p2.x * p3.y - p3.x * p2.y)}; 
+    V4 result = {minors.x, -minors.y, minors.z, p1.x * minors.x + (-1) * p1.y * minors.y + p1.z * minors.z};
     //printf("%f, %f, %f, %f", result.a, result.b, result.c, result.d);
     return result;
 }
 
 
-std::vector <V4> cube_planeset(std::vector <Point> &cube)
+std::vector <V4> cube_planeset(Point cube[])
 {
-
-
-
-
-
-
-
+    std::vector <V4> result(6);
+    result[0] = plane_equation(cube[0], cube[1], cube[2]); // up
+    result[1] = plane_equation(cube[1], cube[2], cube[5]); // back
+    result[2] = plane_equation(cube[1], cube[5], cube[4]); // right
+    result[3] = plane_equation(cube[4], cube[5], cube[6]); // bottom
+    result[4] = plane_equation(cube[6], cube[2], cube[3]); // left
+    result[5] = plane_equation(cube[0], cube[3], cube[4]); // front
+    return result;
 }
+
+void visibility(std::vector <V4> list)
+{
+    V4 vec = {0, 0, 1200, 1};
+    for(size_t i = 0; i < list.size(); ++i)
+    {
+        switch(i)
+        {
+            case 0:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#UP iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+
+            case 1:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#BACK iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+
+            case 2:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#RIGTH iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+
+            case 3:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#BOTTOM iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+
+            case 4:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#LEFT iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+
+            case 5:
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                else
+                {
+                    printf("#FRONT iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                }
+                break;
+        }
+    }
+}
+
 
 void draw_cube(SDL_Renderer *renderer, std::vector <Point> &cube, Color color)
 {
-
-
 
 
 }
@@ -288,6 +363,11 @@ int main(int argc, char *argv[])
                 //find center (origin)
                 Point origin = find_origin(size_x, size_y, k);
 
+                //////
+                
+                //////
+                
+
                 ///
                 for(int i = 0; i < 8; ++i)
                 {
@@ -298,7 +378,10 @@ int main(int argc, char *argv[])
                             pcube[i] = central_projection(cube[i], k);    
                             rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
+                            {
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                                visibility(cube_planeset(cube));
+                            }
                             break;
 
                         case Y:
@@ -306,7 +389,10 @@ int main(int argc, char *argv[])
                             pcube[i] = central_projection(cube[i], k);    
                             rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
+                            {
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                                visibility(cube_planeset(cube));
+                            }
                             break;
 
                         case Z:
@@ -314,7 +400,10 @@ int main(int argc, char *argv[])
                             pcube[i] = central_projection(cube[i], k);    
                             rcube[i] = real_point(origin, pcube[i]);    
                             if(mult != 0)
+                            {
                                 printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                                visibility(cube_planeset(cube));
+                            }
                             break;
                         default:
                             break;
