@@ -108,7 +108,22 @@ void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
     SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
 }
 
-void draw_cube(SDL_Renderer *renderer, Point cube[], Color color)
+void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <std::vector <int>> connections, std::vector <Point> cube, Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+
+    for(size_t i = 0; i < points.size(); ++i)
+    {
+        for(size_t j = i; j < points.size(); ++j)
+        {
+                        
+
+
+        }
+    }
+}
+
+void draw_cube(SDL_Renderer *renderer, std::vector <Point> cube, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
     for(int i = 0; i < 3; ++i)
@@ -145,105 +160,112 @@ V4 plane_equation(Point p1, Point p2, Point p3)
 }
 
 
-std::vector <V4> cube_planeset(Point cube[])
+std::vector <V4> cube_planeset(std::vector <Point> cube)
 {
     std::vector <V4> result(6);
-    result[0] = plane_equation(cube[0], cube[1], cube[2]); // up
+    result[0] = plane_equation(cube[0], cube[3], cube[2]); // up
     result[1] = plane_equation(cube[1], cube[2], cube[5]); // back
     result[2] = plane_equation(cube[1], cube[5], cube[4]); // right
     result[3] = plane_equation(cube[4], cube[5], cube[6]); // bottom
     result[4] = plane_equation(cube[6], cube[2], cube[3]); // left
-    result[5] = plane_equation(cube[0], cube[3], cube[4]); // front
+    result[5] = plane_equation(cube[0], cube[4], cube[7]); // front
     return result;
 }
 
-void visibility(std::vector <V4> list)
+std::vector <V4> visibility(std::vector <V4> list)
 {
-    V4 vec = {0, 0, 1200, 1};
+    V4 vec = {0, 0, -600, 1};
+    std::vector <V4> result;
     for(size_t i = 0; i < list.size(); ++i)
     {
         switch(i)
         {
             case 0:
+                printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#UP iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
 
             case 1:
+                printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#BACK iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
 
             case 2:
+                printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#RIGTH iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
 
             case 3:
+                printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#BOTTOM iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
 
             case 4:
+                printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#LEFT iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
 
             case 5:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
                 if(scalar_mult(vec, list[i]) > 0)
                 {
-                    printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                    result.push_back(list[i]);
                 }
                 else
-                {
-                    printf("#FRONT iS inViSiBlE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
-                }
+                {}
                 break;
         }
     }
+    return result;
 }
 
 
-void draw_cube(SDL_Renderer *renderer, std::vector <Point> &cube, Color color)
+std::vector <int> points_to_render(std::vector <V4> planes, std::vector <Point> obj) 
 {
-
-
+    std::vector <int> result;
+    for(size_t i = 0; i < planes.size(); ++i)
+    {
+        for(size_t j = 0; j < obj.size(); ++j)
+        {
+            V4 v = {obj[j].x, obj[j].y, obj[j].z, 1};
+            if(scalar_mult(v, planes[i]) == 0)
+            {
+                printf("\tPOINTS TO RENDER: %ld\n", j);
+                result.push_back(j); 
+            }
+        }
+    }
+    return result;
 }
 
-
-void transform(Point obj[], int n, double k)
+void transform(std::vector <Point> obj, double k)
 {
-    for(int i = 0; i < n; ++i)
+    for(size_t i = 0; i < obj.size(); ++i)
     {
         obj[i] = {obj[i].x * k, obj[i].y * k, obj[i].z * k};
     }
@@ -286,12 +308,21 @@ Point rotate_z(Point a, double phi, int dir)
 }
 
 //perspective projection
-Point central_projection(Point a, int k)
+Point central_projection(Point a, double k)
 {
     Point result;
     result.y = (k * a.y) / (a.z + k);
     result.x = (k * a.x) / (a.z + k);
     return result;
+}
+
+//perspective projection for an object
+void central_projection(std::vector <Point> &obj, Point origin, double k)
+{
+    for(size_t i = 0; i < obj.size(); ++i)
+    {
+        obj[i] = real_point(origin, central_projection(obj[i], k));    
+    }
 }
 
 //in 2d
@@ -313,7 +344,40 @@ double dist_stereo(Point p1, Point p2)
     return result;
 }
 
+void rotate(Axis axis, std::vector <Point> &cube, double mult, int dir, double k)
+{
+    for(size_t i = 0; i < cube.size(); ++i)
+    {
+        switch(axis)
+        {
+            case X:
+                cube[i] = rotate_x(cube[i], mult, dir); 
+                if(mult != 0)
+                {
+                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                }
+                break;
 
+            case Y:
+                cube[i] = rotate_y(cube[i], mult, dir); 
+                if(mult != 0)
+                {
+                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                }
+                break;
+
+            case Z:
+                cube[i] = rotate_z(cube[i], mult, dir); 
+                if(mult != 0)
+                {
+                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -325,16 +389,25 @@ int main(int argc, char *argv[])
     double scale = 1; // size of obj in "times"
     double scale_time = 1;
 
-
     /// default distance (k) from proj to screen
-    int k = 600;
+    double k = 600;
 
     /// points for cube
-    Point cube[8] = {{100, 100, -100}, {100, 100, 100}, {-100, 100, 100}, {-100, 100, -100},
+    std::vector <Point> cube = {{100, 100, -100}, {100, 100, 100}, {-100, 100, 100}, {-100, 100, -100},
                     {100, -100, -100}, {100, -100, 100}, {-100, -100, 100}, {-100, -100, -100}};
     
-    Point pcube[8];
-    Point rcube[8];
+    std::vector <std::vector <int>> connections = 
+    {{1, 3, 4},
+     {0, 2, 5},
+     {1, 3, 6},
+     {2, 0, 7},
+     {0, 5, 7},
+     {4, 1, 6},
+     {5, 2, 7},
+     {6, 3, 4}
+    };
+
+    std::vector <Point> rcube(8);
     ///
 
     Color color = {231, 222, 111};
@@ -364,55 +437,19 @@ int main(int argc, char *argv[])
                 Point origin = find_origin(size_x, size_y, k);
 
                 //////
+
+                rotate(axis, cube, mult, dir, k);
+
+                // visibility() returns all visible planes of an object
+                points_to_render(visibility(cube_planeset(cube)), cube);
+                central_projection(cube, origin, k);
                 
+
                 //////
-                
 
-                ///
-                for(int i = 0; i < 8; ++i)
-                {
-                    switch(axis)
-                    {
-                        case X:
-                            cube[i] = rotate_x(cube[i], mult, dir); 
-                            pcube[i] = central_projection(cube[i], k);    
-                            rcube[i] = real_point(origin, pcube[i]);    
-                            if(mult != 0)
-                            {
-                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
-                                visibility(cube_planeset(cube));
-                            }
-                            break;
-
-                        case Y:
-                            cube[i] = rotate_y(cube[i], mult, dir); 
-                            pcube[i] = central_projection(cube[i], k);    
-                            rcube[i] = real_point(origin, pcube[i]);    
-                            if(mult != 0)
-                            {
-                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
-                                visibility(cube_planeset(cube));
-                            }
-                            break;
-
-                        case Z:
-                            cube[i] = rotate_z(cube[i], mult, dir); 
-                            pcube[i] = central_projection(cube[i], k);    
-                            rcube[i] = real_point(origin, pcube[i]);    
-                            if(mult != 0)
-                            {
-                                printf("A%d = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
-                                visibility(cube_planeset(cube));
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
                 mult = 0;
                 draw_cube(renderer, rcube, color);
                 ///
-
 
                 SDL_RenderPresent(renderer);
                 while (SDL_PollEvent(&event))
@@ -429,7 +466,7 @@ int main(int argc, char *argv[])
                                 {
                                     scale += 0.1;
                                     scale_time += 0.1;
-                                    transform(cube, 8, scale);
+                                    transform(cube, scale);
                                     printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
                                     scale = 1;
                                 }
@@ -440,7 +477,7 @@ int main(int argc, char *argv[])
                                 {
                                     scale -= 0.1;
                                     scale_time -= 0.1;
-                                    transform(cube, 8, scale);
+                                    transform(cube, scale);
                                     printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
                                     scale = 1;
                                 }
