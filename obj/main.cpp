@@ -108,6 +108,7 @@ void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
     SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
 }
 
+
 void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <std::vector <int>> connections, std::vector <Point> cube, Point origin, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
@@ -116,32 +117,16 @@ void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <st
     {
         for(size_t j = 0; j < connections[points[i]].size(); ++j)
         {
-            SDL_RenderDrawLine(renderer, cube[points[i]].x, cube[points[i]].y, 
-            cube[connections[points[i]][j]].x, cube[connections[points[i]][j]].y);
+            for(size_t t = i; t < points.size(); ++t)
+            {
+                if(connections[points[i]][j] == points[t])
+                {
+                    SDL_RenderDrawLine(renderer, cube[points[i]].x, cube[points[i]].y, 
+                    cube[connections[points[i]][j]].x, cube[connections[points[i]][j]].y);
+                }
+            }
         }
     }
-}
-
-void draw_cube(SDL_Renderer *renderer, std::vector <Point> cube, Color color)
-{
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
-    for(int i = 0; i < 3; ++i)
-    {
-        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 1].x, cube[i + 1].y);
-    }
-    SDL_RenderDrawLine(renderer, cube[0].x, cube[0].y, cube[3].x, cube[3].y);
-
-    for(int i = 4; i < 7; ++i)
-    {
-        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 1].x, cube[i + 1].y);
-    }
-    SDL_RenderDrawLine(renderer, cube[4].x, cube[4].y, cube[7].x, cube[7].y);
-
-    for(int i = 0; i < 4; ++i)
-    {
-        SDL_RenderDrawLine(renderer, cube[i].x, cube[i].y, cube[i + 4].x, cube[i + 4].y);
-    }
-
 }
 
 
@@ -247,22 +232,24 @@ std::vector <V4> visibility(std::vector <V4> list)
 std::vector <int> points_to_render(std::vector <V4> planes, std::vector <Point> obj) 
 {
     std::vector <int> result;
+    std::vector <int> compare(obj.size(), 0);
     for(size_t i = 0; i < planes.size(); ++i)
     {
         for(size_t j = 0; j < obj.size(); ++j)
         {
             V4 v = {obj[j].x, obj[j].y, obj[j].z, 1};
-            if(scalar_mult(v, planes[i]) == 0)
+            if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000 && compare[j] == 0)
             {
                 printf("\tPOINTS TO RENDER: %ld\n", j);
                 result.push_back(j); 
+                compare[j]++;
             }
         }
     }
     return result;
 }
 
-void transform(std::vector <Point> obj, double k)
+void transform(std::vector <Point> &obj, double k)
 {
     for(size_t i = 0; i < obj.size(); ++i)
     {
@@ -325,6 +312,17 @@ std::vector <Point> central_projection(std::vector <Point> obj, Point origin, do
     }
     return result;
 }
+
+std::vector <Point> isometric_projection(std::vector <Point> obj, Point origin)
+{
+    std::vector <Point> result(obj.size());
+    for(size_t i = 0; i < obj.size(); ++i)
+    {
+        result[i] = real_point(origin, obj[i]);
+    }
+    return result;
+}
+
 
 //in 2d
 double dist_flat(Point p1, Point p2)
@@ -448,6 +446,7 @@ int main(int argc, char *argv[])
                 // visibility() returns all visible planes of an object
                 ptr = points_to_render(visibility(cube_planeset(cube)), cube);
                 rcube = central_projection(cube, origin, k);
+                //rcube = isometric_projection(cube, origin);
                 
                 //////
                 draw_cube(renderer, ptr, connections, rcube, origin, color);
