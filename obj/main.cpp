@@ -54,7 +54,7 @@ Point polar_to_dec(double ro, double phi)
     point.ry = ro * std::sin(phi);
     return point;
 }
-
+ 
 Point real_point(Point origin, Point a)
 {
     Point point = {origin.x + a.x, origin.y - a.y, origin.z + a.z};
@@ -108,17 +108,16 @@ void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
     SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
 }
 
-void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <std::vector <int>> connections, std::vector <Point> cube, Color color)
+void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <std::vector <int>> connections, std::vector <Point> cube, Point origin, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
 
     for(size_t i = 0; i < points.size(); ++i)
     {
-        for(size_t j = i; j < points.size(); ++j)
+        for(size_t j = 0; j < connections[points[i]].size(); ++j)
         {
-                        
-
-
+            SDL_RenderDrawLine(renderer, cube[points[i]].x, cube[points[i]].y, 
+            cube[connections[points[i]][j]].x, cube[connections[points[i]][j]].y);
         }
     }
 }
@@ -317,12 +316,14 @@ Point central_projection(Point a, double k)
 }
 
 //perspective projection for an object
-void central_projection(std::vector <Point> &obj, Point origin, double k)
+std::vector <Point> central_projection(std::vector <Point> obj, Point origin, double k)
 {
+    std::vector <Point> result(obj.size());
     for(size_t i = 0; i < obj.size(); ++i)
     {
-        obj[i] = real_point(origin, central_projection(obj[i], k));    
+        result[i] = real_point(origin, central_projection(obj[i], k));
     }
+    return result;
 }
 
 //in 2d
@@ -408,6 +409,10 @@ int main(int argc, char *argv[])
     };
 
     std::vector <Point> rcube(8);
+
+    //##############
+    std::vector <int> ptr;
+    //##############
     ///
 
     Color color = {231, 222, 111};
@@ -441,14 +446,12 @@ int main(int argc, char *argv[])
                 rotate(axis, cube, mult, dir, k);
 
                 // visibility() returns all visible planes of an object
-                points_to_render(visibility(cube_planeset(cube)), cube);
-                central_projection(cube, origin, k);
+                ptr = points_to_render(visibility(cube_planeset(cube)), cube);
+                rcube = central_projection(cube, origin, k);
                 
-
                 //////
-
+                draw_cube(renderer, ptr, connections, rcube, origin, color);
                 mult = 0;
-                draw_cube(renderer, rcube, color);
                 ///
 
                 SDL_RenderPresent(renderer);
