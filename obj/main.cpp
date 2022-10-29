@@ -156,6 +156,21 @@ std::vector <V4> cube_planeset(std::vector <Point> cube)
     return result;
 }
 
+std::vector <V4> pyramid_planeset(std::vector <Point> obj)
+{
+    std::vector <V4> result(9);
+    result[0] = plane_equation(obj[0], obj[1], obj[2]); // bottom 
+    result[1] = plane_equation(obj[0], obj[7], obj[8]); // plane0
+    result[2] = plane_equation(obj[1], obj[0], obj[8]); // plane1
+    result[3] = plane_equation(obj[2], obj[1], obj[8]); // plane2
+    result[4] = plane_equation(obj[3], obj[2], obj[8]); // plane3
+    result[5] = plane_equation(obj[4], obj[3], obj[8]); // plane4
+    result[6] = plane_equation(obj[5], obj[4], obj[8]); // plane5
+    result[7] = plane_equation(obj[6], obj[5], obj[8]); // plane6
+    result[8] = plane_equation(obj[7], obj[6], obj[8]); // plane7
+    return result;
+}
+
 std::vector <V4> visibility(std::vector <V4> list)
 {
     V4 vec = {0, 0, -600, 1};
@@ -223,6 +238,36 @@ std::vector <V4> visibility(std::vector <V4> list)
                 else
                 {}
                 break;
+
+            case 6:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    result.push_back(list[i]);
+                }
+                else
+                {}
+                break;
+        
+            case 7:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    result.push_back(list[i]);
+                }
+                else
+                {}
+                break;
+
+            case 8:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i])); 
+                if(scalar_mult(vec, list[i]) > 0)
+                {
+                    result.push_back(list[i]);
+                }
+                else
+                {}
+                break;
         }
     }
     return result;
@@ -244,6 +289,7 @@ std::vector <int> points_to_render(std::vector <V4> planes, std::vector <Point> 
                 result.push_back(j); 
                 compare[j]++;
             }
+            //if(compare[j] != 
         }
     }
     return result;
@@ -391,6 +437,17 @@ int main(int argc, char *argv[])
     /// default distance (k) from proj to screen
     double k = 600;
 
+    // for pyramid
+    ///
+    double a = 100;
+    double h = 600;
+    double r = a / 2 * 1.4 + a / 2;
+    ///
+
+    /// points for pyramid 
+    std::vector <Point> pyramid = {{a / 2, -h / 2, -r}, {r, -h / 2, 0}, {r, -h / 2, a / 2}, {a / 2, -h / 2, 2 * r},
+                    {-a / 2, -h / 2, 2 * r}, {-r, -h / 2, a / 2}, {-r, -h / 2, -a / 2}, {-a / 2, -h / 2, -r}, {0, h / 2, 0}};
+
     /// points for cube
     std::vector <Point> cube = {{100, 100, -100}, {100, 100, 100}, {-100, 100, 100}, {-100, 100, -100},
                     {100, -100, -100}, {100, -100, 100}, {-100, -100, 100}, {-100, -100, -100}};
@@ -406,7 +463,20 @@ int main(int argc, char *argv[])
      {6, 3, 4}
     };
 
+    std::vector <std::vector <int>> connections_pyr = 
+    {{1, 7, 8},
+     {0, 2, 8},
+     {1, 3, 8},
+     {2, 4, 8},
+     {3, 5, 8},
+     {4, 6, 8},
+     {5, 7, 8},
+     {6, 0, 8},
+     {0, 1, 2, 3, 4, 5, 6, 7}
+    };
+
     std::vector <Point> rcube(8);
+    std::vector <Point> rpyramid(9);
 
     //##############
     std::vector <int> ptr;
@@ -441,15 +511,15 @@ int main(int argc, char *argv[])
 
                 //////
 
-                rotate(axis, cube, mult, dir, k);
+                rotate(axis, pyramid, mult, dir, k);
 
                 // visibility() returns all visible planes of an object
-                ptr = points_to_render(visibility(cube_planeset(cube)), cube);
-                rcube = central_projection(cube, origin, k);
+                ptr = points_to_render(visibility(pyramid_planeset(pyramid)), pyramid);
+                rpyramid = central_projection(pyramid, origin, k);
                 //rcube = isometric_projection(cube, origin);
                 
                 //////
-                draw_cube(renderer, ptr, connections, rcube, origin, color);
+                draw_cube(renderer, ptr, connections_pyr, rpyramid, origin, color);
                 mult = 0;
                 ///
 
@@ -468,7 +538,7 @@ int main(int argc, char *argv[])
                                 {
                                     scale += 0.1;
                                     scale_time += 0.1;
-                                    transform(cube, scale);
+                                    transform(pyramid, scale);
                                     printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
                                     scale = 1;
                                 }
@@ -479,7 +549,7 @@ int main(int argc, char *argv[])
                                 {
                                     scale -= 0.1;
                                     scale_time -= 0.1;
-                                    transform(cube, scale);
+                                    transform(pyramid, scale);
                                     printf("SCALE = %f, scale_time = %f\n", scale, scale_time);
                                     scale = 1;
                                 }
