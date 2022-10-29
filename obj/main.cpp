@@ -39,6 +39,12 @@ enum Axis
     Z
 };
 
+struct Edge
+{
+    Point a;
+    Point b;
+};
+
 
 double scalar_mult(V4 vec1, V4 vec2)
 {
@@ -109,23 +115,12 @@ void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 }
 
 
-void draw_cube(SDL_Renderer *renderer, std::vector <int> points, std::vector <std::vector <int>> connections, std::vector <Point> cube, Point origin, Color color)
+void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
-
-    for(size_t i = 0; i < points.size(); ++i)
+    for(size_t i = 0; i < edges.size(); ++i)
     {
-        for(size_t j = 0; j < connections[points[i]].size(); ++j)
-        {
-            for(size_t t = i; t < points.size(); ++t)
-            {
-                if(connections[points[i]][j] == points[t])
-                {
-                    SDL_RenderDrawLine(renderer, cube[points[i]].x, cube[points[i]].y, 
-                    cube[connections[points[i]][j]].x, cube[connections[points[i]][j]].y);
-                }
-            }
-        }
+        draw_segment(renderer, edges[i].a, edges[i].b, color);
     }
 }
 
@@ -274,26 +269,33 @@ std::vector <V4> visibility(std::vector <V4> list)
 }
 
 
-std::vector <int> points_to_render(std::vector <V4> planes, std::vector <Point> obj) 
+std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj) 
 {
-    std::vector <int> result;
-    std::vector <int> compare(obj.size(), 0);
+    std::vector <Edge> result;
     for(size_t i = 0; i < planes.size(); ++i)
     {
         for(size_t j = 0; j < obj.size(); ++j)
         {
+            // if point belongs to plane ...
             V4 v = {obj[j].x, obj[j].y, obj[j].z, 1};
-            if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000 && compare[j] == 0)
+            if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
             {
-                printf("\tPOINTS TO RENDER: %ld\n", j);
-                result.push_back(j); 
-                compare[j]++;
+                for(size_t t = 0; t < connections[j].size(); ++t)
+                {
+                    V4 v1 = {obj[connections[j][t]].x, obj[connections[j][t]].y, obj[connections[j][t]].z, 1};
+                    if(std::abs(std::round(scalar_mult(v1, planes[i])*1000)/1000) == 0.000)
+                    {
+                        Edge edges = {obj[j], obj[connections[j][t]]};
+                        result.push_back(edges);
+                        printf("\tEDGE TO RENDER: %ld, %d\n", j, connections[j][t]);
+                    }
+                }
             }
-            //if(compare[j] != 
         }
     }
     return result;
 }
+
 
 void transform(std::vector <Point> &obj, double k)
 {
@@ -349,26 +351,40 @@ Point central_projection(Point a, double k)
 }
 
 //perspective projection for an object
-std::vector <Point> central_projection(std::vector <Point> obj, Point origin, double k)
+void central_projection(std::vector <Point> &obj, Point origin, double k)
 {
-    std::vector <Point> result(obj.size());
     for(size_t i = 0; i < obj.size(); ++i)
     {
-        result[i] = real_point(origin, central_projection(obj[i], k));
+        obj[i] = real_point(origin, central_projection(obj[i], k));
     }
-    return result;
 }
 
-std::vector <Point> isometric_projection(std::vector <Point> obj, Point origin)
+//perspective projection for array of edges
+void central_projection(std::vector <Edge> &edges, Point origin, double k)
 {
-    std::vector <Point> result(obj.size());
+    for(size_t i = 0; i < edges.size(); ++i)
+    {
+        edges[i] = {real_point(origin, central_projection(edges[i].a, k)),
+                    real_point(origin, central_projection(edges[i].b, k))};
+    }
+}
+
+void isometric_projection(std::vector <Point> &obj, Point origin)
+{
     for(size_t i = 0; i < obj.size(); ++i)
     {
-        result[i] = real_point(origin, obj[i]);
+        obj[i] = real_point(origin, obj[i]);
     }
-    return result;
 }
 
+//isomtric projection for array of edges
+void isometric_projection(std::vector <Edge> &edges, Point origin)
+{
+    for(size_t i = 0; i < edges.size(); ++i)
+    {
+        edges[i] = {real_point(origin, edges[i].a), real_point(origin, edges[i].b)};
+    }
+}
 
 //in 2d
 double dist_flat(Point p1, Point p2)
@@ -389,33 +405,33 @@ double dist_stereo(Point p1, Point p2)
     return result;
 }
 
-void rotate(Axis axis, std::vector <Point> &cube, double mult, int dir, double k)
+void rotate(Axis axis, std::vector <Point> &obj, double mult, int dir, double k)
 {
-    for(size_t i = 0; i < cube.size(); ++i)
+    for(size_t i = 0; i < obj.size(); ++i)
     {
         switch(axis)
         {
             case X:
-                cube[i] = rotate_x(cube[i], mult, dir); 
+                obj[i] = rotate_x(obj[i], mult, dir); 
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
                 }
                 break;
 
             case Y:
-                cube[i] = rotate_y(cube[i], mult, dir); 
+                obj[i] = rotate_y(obj[i], mult, dir); 
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
                 }
                 break;
 
             case Z:
-                cube[i] = rotate_z(cube[i], mult, dir); 
+                obj[i] = rotate_z(obj[i], mult, dir); 
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, cube[i].x, cube[i].y, cube[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
                 }
                 break;
             default:
@@ -437,6 +453,7 @@ int main(int argc, char *argv[])
     /// default distance (k) from proj to screen
     double k = 600;
 
+
     // for pyramid
     ///
     double a = 100;
@@ -445,14 +462,14 @@ int main(int argc, char *argv[])
     ///
 
     /// points for pyramid 
-    std::vector <Point> pyramid = {{a / 2, -h / 2, -r}, {r, -h / 2, 0}, {r, -h / 2, a / 2}, {a / 2, -h / 2, 2 * r},
-                    {-a / 2, -h / 2, 2 * r}, {-r, -h / 2, a / 2}, {-r, -h / 2, -a / 2}, {-a / 2, -h / 2, -r}, {0, h / 2, 0}};
+    std::vector <Point> pyramid = {{a / 2, -h / 2, -r}, {r, -h / 2, -a / 2}, {r, -h / 2, a / 2}, {a / 2, -h / 2, r},
+                    {-a / 2, -h / 2, r}, {-r, -h / 2, a / 2}, {-r, -h / 2, -a / 2}, {-a / 2, -h / 2, -r}, {0, h / 2, 0}};
 
     /// points for cube
     std::vector <Point> cube = {{100, 100, -100}, {100, 100, 100}, {-100, 100, 100}, {-100, 100, -100},
                     {100, -100, -100}, {100, -100, 100}, {-100, -100, 100}, {-100, -100, -100}};
     
-    std::vector <std::vector <int>> connections = 
+    std::vector <std::vector <int>> connections_cube = 
     {{1, 3, 4},
      {0, 2, 5},
      {1, 3, 6},
@@ -475,11 +492,8 @@ int main(int argc, char *argv[])
      {0, 1, 2, 3, 4, 5, 6, 7}
     };
 
-    std::vector <Point> rcube(8);
-    std::vector <Point> rpyramid(9);
-
     //##############
-    std::vector <int> ptr;
+    std::vector <Edge> edges;
     //##############
     ///
 
@@ -510,16 +524,14 @@ int main(int argc, char *argv[])
                 Point origin = find_origin(size_x, size_y, k);
 
                 //////
-
                 rotate(axis, pyramid, mult, dir, k);
 
                 // visibility() returns all visible planes of an object
-                ptr = points_to_render(visibility(pyramid_planeset(pyramid)), pyramid);
-                rpyramid = central_projection(pyramid, origin, k);
-                //rcube = isometric_projection(cube, origin);
+                edges = edges_to_render(visibility(pyramid_planeset(pyramid)), connections_pyr, pyramid);
+                central_projection(edges, origin, k);
                 
                 //////
-                draw_cube(renderer, ptr, connections_pyr, rpyramid, origin, color);
+                draw_obj(renderer, edges, color);
                 mult = 0;
                 ///
 
