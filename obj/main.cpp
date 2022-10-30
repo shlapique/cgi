@@ -4,8 +4,8 @@
 
 #include "Core.h"
 #include "Math.h"
-
  
+
 Point real_point(Point origin, Point a)
 {
     Point point = {origin.x + a.x, origin.y - a.y, origin.z + a.z};
