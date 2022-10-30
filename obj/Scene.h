@@ -2,7 +2,6 @@
 #define __SCENE_H__
 
 
-
 class Scene
 {
     public:

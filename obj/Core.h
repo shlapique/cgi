@@ -1,5 +1,4 @@
-#ifndef __CORE_H__
-#define __CORE_H__
+#pragma once
 
 struct Point
 {
@@ -41,5 +40,3 @@ struct Edge
     Point a;
     Point b;
 };
-
-#endif

@@ -1,14 +1,18 @@
-#OBJS specifies which files to compile as part of the project
-OBJS = main.cpp
+CC=g++
+CFLAGS=-Wall
+OBJS=main.o Math.o
+LINKER_FLAGS=-lSDL2
+TARGET=out
 
-#compiler
-CC = g++
+all: $(TARGET)
 
-COMPILER_FLAGS = -Wall
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(LINKER_FLAGS) -o $(TARGET) main.o Math.o 
 
-LINKER_FLAGS = -lSDL2
+main.o: main.cpp Math.h Core.h
+	$(CC) $(CFLAGS)  -c main.cpp
 
-OBJ_NAME = out
+Math.o: Math.h Core.h
 
-all : $(OBJS)
-	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+clean:
+	rm -rf $(OBJS) $(TARGET)

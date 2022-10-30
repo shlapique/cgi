@@ -2,8 +2,6 @@
 #define __OBJECT__
 
 
-
-
 class Object
 {
 
