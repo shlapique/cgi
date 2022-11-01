@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include "Core.h"
+#include <vector>
+#include <cstdio>
 
 double scalar_mult(V4, V4);
 Point polar_to_dec(double, double);
@@ -13,5 +15,8 @@ double dist_flat(Point, Point);
 
 //in 3d
 double dist_stereo(Point, Point);
+
+Point real_point(Point, Point);
+std::vector <Edge> edges_to_render(std::vector <V4>, std::vector <std::vector <int>>, std::vector <Point>);
 
 #endif
