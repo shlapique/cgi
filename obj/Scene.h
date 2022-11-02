@@ -3,49 +3,50 @@
 
 #include "Core.h"
 #include "Math.h"
+#include "Object.h"
+#include <SDL2/SDL.h>
 
-class Scene
+class Scene : public Object
 {
     public:
         Scene();
+        Scene(SDL_Renderer *renderer);
         Point rotate_x(Point, double, int);
         Point rotate_y(Point, double, int);
         Point rotate_z(Point, double, int);
-        void rotate(Axis, std::vector <Point> &obj, double, int, double);
+        void rotate(Axis, double, int, double);
 
         //perspective projection
-        Point central_projection(Point, double);
-
-        //perspective projection for an object
-        void central_projection(std::vector <Point> &obj, Point, double);
-
+        Point point_central_projection(Point, double);
         //perspective projection for array of edges
-        void central_projection(std::vector <Edge> &edges, Point, double);
+        void edges_central_projection(Point, double);
+        void central_projection(Point, double);
 
-        void isometric_projection(std::vector <Point> &obj, Point);
-
+        //isometric projection for array of Points
+        void vertex_isometric_projection(Point);
         //isomtric projection for array of edges
-        void isometric_projection(std::vector <Edge> &edges, Point);
+        void edges_isometric_projection(Point);
+        void isometric_projection(Point);
 
-        std::vector <V4> visibility(std::vector <V4>);
+        void transform(double);
 
-        /*
-        //midpoint circle algorithm
-        void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius);
         void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color);
         void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color color);
-        */
+
+        //=====
+        void draw(Color color);
 
     private:
-        //SDL_Renderer *renderer = NULL; 
-        double mult;
-        int dir = 1; //default for my SC is clockwise (oZ looks away from me)
-        Axis axis = X; // to change axis of rotation
+        SDL_Renderer *renderer = NULL; 
+        double *mult;
+        int *dir; //default for my SC is clockwise (oZ looks away from me)
+        Axis *axis; // to change axis of rotation
         double scale = 1; // size of obj in "times"
         double scale_time = 1;
         /// default distance (k) from proj to screen
         double k = 600;
         Color color = {231, 222, 111};
+        std::vector <Edge> edges;
 };
 
 #endif

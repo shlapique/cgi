@@ -1,10 +1,13 @@
 #include "Scene.h"
-#include "Math.h"
-#include "Core.h"
 
 Scene::Scene()
 {
     printf("/// EMPTY SCENE CREATED! ///\n");
+}
+
+Scene::Scene(SDL_Renderer *renderer)
+{
+    this->renderer = renderer;
 }
 
 // Where dir = 1 or -1
@@ -36,7 +39,7 @@ Point Scene::rotate_z(Point a, double phi, int dir)
 }
 
 //perspective projection
-Point Scene::central_projection(Point a, double k)
+Point Scene::point_central_projection(Point a, double k)
 {
     Point result;
     result.y = (k * a.y) / (a.z + k);
@@ -44,69 +47,74 @@ Point Scene::central_projection(Point a, double k)
     return result;
 }
 
-//perspective projection for an object
-void Scene::central_projection(std::vector <Point> &obj, Point origin, double k)
-{
-    for(size_t i = 0; i < obj.size(); ++i)
-    {
-        obj[i] = real_point(origin, central_projection(obj[i], k));
-    }
-}
-
 //perspective projection for array of edges
-void Scene::central_projection(std::vector <Edge> &edges, Point origin, double k)
+void Scene::edges_central_projection(Point origin, double k)
 {
     for(size_t i = 0; i < edges.size(); ++i)
     {
-        edges[i] = {real_point(origin, central_projection(edges[i].a, k)),
-                    real_point(origin, central_projection(edges[i].b, k))};
+        this->edges[i] = {real_point(origin, point_central_projection(edges[i].a, k)),
+                    real_point(origin, point_central_projection(edges[i].b, k))};
     }
 }
 
-void Scene::isometric_projection(std::vector <Point> &obj, Point origin)
+void Scene::vertex_isometric_projection(Point origin)
 {
-    for(size_t i = 0; i < obj.size(); ++i)
+    for(size_t i = 0; i < vertex.size(); ++i)
     {
-        obj[i] = real_point(origin, obj[i]);
+        this->vertex[i] = real_point(origin, vertex[i]);
     }
 }
 
-//isomtric projection for array of edges
-void Scene::isometric_projection(std::vector <Edge> &edges, Point origin)
+//isometric projection for array of edges
+void Scene::edges_isometric_projection(Point origin)
 {
     for(size_t i = 0; i < edges.size(); ++i)
     {
-        edges[i] = {real_point(origin, edges[i].a), real_point(origin, edges[i].b)};
+        this->edges[i] = {real_point(origin, edges[i].a), real_point(origin, edges[i].b)};
     }
 }
 
-void Scene::rotate(Axis axis, std::vector <Point> &obj, double mult, int dir, double k)
+void Scene::isometric_projection(Point origin)
 {
-    for(size_t i = 0; i < obj.size(); ++i)
+    this->edges = edges_to_render(visibility(planeset_pyr(vertex)), connections, vertex);
+    edges_isometric_projection(origin);
+}
+
+void Scene::transform(double k)
+{
+    for(size_t i = 0; i < vertex.size(); ++i)
+    {
+        this->vertex[i] = {vertex[i].x * k, vertex[i].y * k, vertex[i].z * k}; 
+    }
+}
+
+void Scene::rotate(Axis axis, double mult, int dir, double k)
+{
+    for(size_t i = 0; i < vertex.size(); ++i)
     {
         switch(axis)
         {
             case X:
-                obj[i] = rotate_x(obj[i], mult, dir);
+                this->vertex[i] = rotate_x(vertex[i], mult, dir);
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, vertex[i].x, vertex[i].y, vertex[i].z);
                 }
                 break;
 
             case Y:
-                obj[i] = rotate_y(obj[i], mult, dir);
+                this->vertex[i] = rotate_y(vertex[i], mult, dir);
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, vertex[i].x, vertex[i].y, vertex[i].z);
                 }
                 break;
 
             case Z:
-                obj[i] = rotate_z(obj[i], mult, dir);
+                this->vertex[i] = rotate_z(vertex[i], mult, dir);
                 if(mult != 0)
                 {
-                    printf("A%ld = {%f, %f, %f}\n", i, obj[i].x, obj[i].y, obj[i].z);
+                    printf("A%ld = {%f, %f, %f}\n", i, vertex[i].x, vertex[i].y, vertex[i].z);
                 }
                 break;
             default:
@@ -115,104 +123,29 @@ void Scene::rotate(Axis axis, std::vector <Point> &obj, double mult, int dir, do
     }
 }
 
-std::vector <V4> Scene::visibility(std::vector <V4> list)
+void Scene::draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 {
-    V4 vec = {0, 0, -600, 1};
-    std::vector <V4> result;
-    for(size_t i = 0; i < list.size(); ++i)
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
+}
+
+
+void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    for(size_t i = 0; i < edges.size(); ++i)
     {
-        switch(i)
-        {
-            case 0:
-                printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 1:
-                printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 2:
-                printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 3:
-                printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 4:
-                printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 5:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 6:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 7:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-
-            case 8:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                if(scalar_mult(vec, list[i]) > 0)
-                {
-                    result.push_back(list[i]);
-                }
-                else
-                {}
-                break;
-        }
+        draw_segment(renderer, edges[i].a, edges[i].b, color);
     }
-    return result;
+}
+
+void Scene::central_projection(Point origin, double k)
+{
+    this->edges = edges_to_render(visibility(planeset_pyr(vertex)), connections, vertex);
+    edges_central_projection(origin, k);
+}
+
+void Scene::draw(Color color)
+{
+    draw_obj(renderer, edges, color);
 }

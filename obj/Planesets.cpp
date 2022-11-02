@@ -26,3 +26,13 @@ std::vector <V4> planeset_cube(std::vector <Point> vertex)
     result[5] = plane_equation(vertex[0], vertex[4], vertex[7]); // front
     return result;
 }
+
+std::vector <V4> planeset_tetra(std::vector <Point> vertex)
+{
+    std::vector <V4> result(4);
+    result[0] = plane_equation(vertex[0], vertex[1], vertex[2]); // bottom
+    result[1] = plane_equation(vertex[0], vertex[2], vertex[3]); // front 
+    result[2] = plane_equation(vertex[0], vertex[3], vertex[1]); // right
+    result[3] = plane_equation(vertex[1], vertex[3], vertex[2]); // bottom
+    return result;
+}

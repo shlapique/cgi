@@ -53,6 +53,13 @@ Point real_point(Point origin, Point a)
     return point;
 }
 
+//screen center
+Point find_origin(int size_x, int size_y, double k)
+{
+    Point point = {std::round(size_x / 2), std::round(size_y / 2), k};
+    return point;
+}
+
 std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj)
 {
     std::vector <Edge> result;
@@ -71,10 +78,62 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
                     {
                         Edge edges = {obj[j], obj[connections[j][t]]};
                         result.push_back(edges);
-                        printf("\tEDGE TO RENDER: %ld, %d\n", j, connections[j][t]);
+                        //printf("\tEDGE TO RENDER: %ld, %d\n", j, connections[j][t]);
                     }
                 }
             }
+        }
+    }
+    return result;
+}
+
+std::vector <V4> visibility(std::vector <V4> list)
+{
+    V4 vec = {0, 0, -600, 1};
+    std::vector <V4> result;
+    for(size_t i = 0; i < list.size(); ++i)
+    {
+        if(scalar_mult(vec, list[i]) > 0)
+        {
+            result.push_back(list[i]);
+        }
+        switch(i)
+        {
+            case 0:
+                printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 1:
+                printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 2:
+                printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 3:
+                printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 4:
+                printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 5:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 6:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 7:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
+
+            case 8:
+                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
+                break;
         }
     }
     return result;
