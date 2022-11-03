@@ -1,8 +1,9 @@
 #ifndef __OBJECT_H__
 #define __OBJECT_H__
 
-#include "Planesets.h"
-
+#include <vector>
+#include "Core.h"
+#include "Math.h"
 
 class Object 
 {
@@ -13,7 +14,7 @@ class Object
         void create_tetra(double a);
 
         std::vector <Point> vertex;
-        std::vector <V4> planeset;
+        std::vector <std::vector <int>> planeset;
         std::vector <std::vector <int>> connections;
 };
 

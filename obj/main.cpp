@@ -20,11 +20,6 @@ int main(int argc, char *argv[])
     /// default distance (k) from proj to screen
     double k = 600;
 
-    // for pyramid
-    ///
-    double a = 100;
-    double h = 600;
-    ///
 
     Color color = {231, 222, 111};
     //Color coord_color = {2, 0, 200};
@@ -37,12 +32,14 @@ int main(int argc, char *argv[])
         if (SDL_CreateWindowAndRenderer(size_x, size_y, SDL_WINDOW_RESIZABLE, &window, &renderer) == 0) 
         {
             SDL_bool done = SDL_FALSE;
+
             //+++++++++++++++
             Scene scene(renderer);
             scene.create_pyramid(100, 600);
             //scene.create_cube(100);
             //scene.create_tetra(100);
             //+++++++++++++++
+
             while (!done) 
             {
                 SDL_Event event;

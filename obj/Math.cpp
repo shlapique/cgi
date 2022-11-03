@@ -28,6 +28,16 @@ V4 plane_equation(Point p1, Point p2, Point p3)
     return result;
 }
 
+std::vector <V4> get_planeset(std::vector <Point> vertex, std::vector <std::vector <int>> planeset)
+{
+    std::vector <V4> result(planeset.size());
+    for(size_t i = 0; i < planeset.size(); ++i)
+    {
+        result[i] = plane_equation(vertex[planeset[i][0]], vertex[planeset[i][1]], vertex[planeset[i][2]]);
+    }
+    return result;
+}
+
 //in 2d
 double dist_flat(Point p1, Point p2)
 {

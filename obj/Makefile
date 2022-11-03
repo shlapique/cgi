@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-Wall
-OBJS=main.o Math.o Scene.o Planesets.o Object.o
+OBJS=main.o Math.o Scene.o Object.o
 LINKER_FLAGS=-lSDL2
 TARGET=out
 
@@ -15,10 +15,6 @@ main.o: main.cpp Math.h Core.h Scene.h Object.h
 Math.o: Math.h Core.h
 
 Scene.o: Math.h Core.h Object.h
-
-Planesets.o: Core.h Math.h
-
-Object.o: Planesets.h
 
 clean:
 	rm -rf $(OBJS) $(TARGET)

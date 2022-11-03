@@ -9,6 +9,7 @@
 double scalar_mult(V4, V4);
 Point polar_to_dec(double, double);
 V4 plane_equation(Point, Point, Point);
+std::vector <V4> get_planeset(std::vector <Point>, std::vector <std::vector <int>>);
 
 //in 2d
 double dist_flat(Point, Point);

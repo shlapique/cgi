@@ -76,7 +76,7 @@ void Scene::edges_isometric_projection(Point origin)
 
 void Scene::isometric_projection(Point origin)
 {
-    this->edges = edges_to_render(visibility(planeset_pyr(vertex)), connections, vertex);
+    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
     edges_isometric_projection(origin);
 }
 
@@ -141,7 +141,7 @@ void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color col
 
 void Scene::central_projection(Point origin, double k)
 {
-    this->edges = edges_to_render(visibility(planeset_pyr(vertex)), connections, vertex);
+    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
     edges_central_projection(origin, k);
 }
 
