@@ -107,44 +107,6 @@ std::vector <V4> visibility(std::vector <V4> list)
         {
             result.push_back(list[i]);
         }
-        switch(i)
-        {
-            case 0:
-                printf("#UP IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 1:
-                printf("#BACK IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 2:
-                printf("#RIGTH IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 3:
-                printf("#BOTTOM IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 4:
-                printf("#LEFT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 5:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 6:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 7:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-
-            case 8:
-                printf("#FRONT IS VISIBLE = %ld :: scalar_mult = %f\n", i, scalar_mult(vec, list[i]));
-                break;
-        }
     }
     return result;
 }
