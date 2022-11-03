@@ -7,24 +7,6 @@
 #include "Scene.h"
 #include "Object.h"
  
-void isometric_projection(std::vector <Point> &obj, Point origin)
-{
-    for(size_t i = 0; i < obj.size(); ++i)
-    {
-        obj[i] = real_point(origin, obj[i]);
-    }
-}
-
-//isomtric projection for array of edges
-void isometric_projection(std::vector <Edge> &edges, Point origin)
-{
-    for(size_t i = 0; i < edges.size(); ++i)
-    {
-        edges[i] = {real_point(origin, edges[i].a), real_point(origin, edges[i].b)};
-    }
-}
-
-
 int main(int argc, char *argv[])
 {
     int size_x = 640;
