@@ -10,15 +10,15 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(LINKER_FLAGS) -o $(TARGET) $(OBJS)
 
 main.o: main.cpp Math.h Core.h Scene.h Object.h
-	$(CC) $(CFLAGS)  -c main.cpp
+	$(CC) $(CFLAGS) -c main.cpp
 
 Math.o: Math.h Core.h
 
-Scene.o: Math.h Core.h
+Scene.o: Math.h Core.h Object.h
 
-Planesets.o: Core.h
+Planesets.o: Core.h Math.h
 
-Object.o: Scene.h Planesets.h
+Object.o: Planesets.h
 
 clean:
 	rm -rf $(OBJS) $(TARGET)
