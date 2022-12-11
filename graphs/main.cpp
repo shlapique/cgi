@@ -150,6 +150,20 @@ std::vector <std::vector <int>> cardioid(int size_x, int size_y, Point origin, d
     return vec;
 }
 
+std::vector <std::vector <int>> ellipse(int size_x, int size_y, Point origin, double prec, double a, double b)
+{
+    std::vector <std::vector <int>> vec;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        // f = a * (1 - std::cos(i * prec)); // ro
+        x = origin.x + (int)std::round(a * std::cos(i * prec));
+        y = size_y - origin.y - (int)std::round(b * std::sin(i * prec));
+        vec.push_back({x , y});
+    }
+    return vec;
+}
+
 
 Point origin(int size_x, int size_y)
 {
@@ -203,13 +217,15 @@ int main(int argc, char *argv[])
     int size_x = 640;
     int size_y = 480; 
     double a = 10;
+    double b = 10;
     double mult = 1;
     Color color = {231, 222, 111};
     Color coord_color = {2, 0, 200};
 
     //
-    printf("ENTER (a) parameter = ");
+    printf("ENTER (a, b) parameter = ");
     scanf("%lf", &a);
+    scanf("%lf", &b);
     //
     
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
@@ -237,10 +253,11 @@ int main(int argc, char *argv[])
                 draw_coords(renderer, size_x, size_y, 1 / (mult * 100), coord_color);
 
                 ////
-                draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
+                //draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 // draw(renderer, flower(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 // draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
                 // draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
+                draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color);
                 ////
 
                 SDL_RenderPresent(renderer);
