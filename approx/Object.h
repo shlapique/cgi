@@ -12,7 +12,7 @@ class Object
         void create_pyramid(double a, double h);
         void create_cube(double a);
         void create_tetra(double a);
-        void create_trunc_cylinder(double a, double b, double prec);
+        void create_trunc_cylinder(double a, double b, double h, int prec);
 
         std::vector <Point> vertex;
         std::vector <std::vector <int>> planeset;

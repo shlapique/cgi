@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
             //+++++++++++++++
             Scene scene(renderer);
-            scene.create_trunc_cylinder(500, 300, 1);
+            scene.create_trunc_cylinder(500, 300, 500, 10);
             //+++++++++++++++
 
             while (!done) 

@@ -77,18 +77,52 @@ void Object::create_tetra(double a)
 }
 
 // a -- for bigger radius of bottom ellipse, b -- for smaller one.
-void Object::create_trunc_cylinder(double a, double b, double prec)
+void Object::create_trunc_cylinder(double a, double b, double h, int prec)
 {
     printf("_____TRUNC_CYLINGER's CREATED______\n");
-    this->vertex = 
-    {{0, 0, -b / 2}, {a / 2, 0, 0}, {0, 0, b / 2}, {-a / 2, 0, 0}};
-    this->planeset = 
-    {{0, 3, 2},
-     {0, 1, 2}};
+    this->vertex.resize(prec * 2);
+    for(int i = 0; i < prec; ++i)
+    {
+        printf("I + == %d \n", i);
+        this->vertex[i] = {{a * std::cos((6.28 / prec) * i)}, -h / 2 , {b * std::sin((6.28 / prec) * i)}};
+        this->vertex[i + prec] = {vertex[i].x, {h / 2 + std::tan(3.14 / 6) * (vertex[0].x - vertex[i].x)}, vertex[i].z};
+        printf("vertex[i]x + == %f \n", this->vertex[i].x);
+        printf("vertex[i]z + == %f \n", this->vertex[i].z);
 
-    this->connections = 
-    {{1, 3},
-     {0, 2},
-     {1, 3},
-     {2, 0}};
+        if(i == 0)
+        {
+            this->planeset.push_back({0, prec - 1, prec - 1 + prec}); 
+        }
+        else 
+        { 
+            this->planeset.push_back({i, i - 1, i - 1 + prec});
+        }
+    }
+    this->planeset.push_back({0, 1, 2});
+    this->planeset.push_back({2 * prec - 1, 2 * prec - 2, 2 * prec - 3});
+
+    for(int i = 0; i < prec * 2; ++i)
+    {
+        if(i == 0)
+            this->connections.push_back({prec - 1, i + 1, i + prec});
+        else 
+        { 
+            if (i == prec - 1)
+                this->connections.push_back({i - 1, 0, i + prec}); 
+            else
+            {
+                if (i == prec)
+                    this->connections.push_back({0, i + 1, 2 * prec - 1});
+                else
+                {
+                    if (i == 2 * prec - 1)
+                        this->connections.push_back({i - 1, prec, prec - 1});
+                    else
+                    {
+                        this->connections.push_back({i - 1, i + 1, i + prec});
+                    }
+                }
+            }
+        }
+    }
 }
