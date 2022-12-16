@@ -20,6 +20,7 @@ class Scene : public Object
         Point point_central_projection(Point, double);
         //perspective projection for array of edges
         void edges_central_projection(Point, double);
+        void tri_central_projection(Point, double);
         void central_projection(Point, double);
 
         //isometric projection for array of Points
@@ -31,7 +32,7 @@ class Scene : public Object
         void transform(double);
 
         void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color);
-        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color color);
+        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri, Color color);
 
         //=====
         void draw(Color color);
@@ -47,6 +48,7 @@ class Scene : public Object
         double k = 600;
         Color color = {231, 222, 111};
         std::vector <Edge> edges;
+        std::vector <std::vector <Point>> tri;
 };
 
 #endif

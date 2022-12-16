@@ -19,7 +19,6 @@ struct V4
     double d;  
 };
 
-
 struct Color
 {
     unsigned char r;

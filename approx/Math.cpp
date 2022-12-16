@@ -70,9 +70,11 @@ Point find_origin(int size_x, int size_y, double k)
     return point;
 }
 
-std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj)
+std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj,
+                                    std::vector <std::vector <Point>> &tri)
 {
     std::vector <Edge> result;
+    tri = {};
     for(size_t i = 0; i < planes.size(); ++i)
     {
         for(size_t j = 0; j < obj.size(); ++j)
@@ -81,16 +83,29 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
             V4 v = {obj[j].x, obj[j].y, obj[j].z, 1};
             if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
             {
+                int counter = 0;
+                std::vector <Point> vec;
+                vec.push_back(obj[j]);
                 for(size_t t = 0; t < connections[j].size(); ++t)
                 {
+                    //printf("SKDRJ:S TEST IN MANY THINGS!!!\n");
                     V4 v1 = {obj[connections[j][t]].x, obj[connections[j][t]].y, obj[connections[j][t]].z, 1};
                     if(std::abs(std::round(scalar_mult(v1, planes[i])*1000)/1000) == 0.000)
                     {
+                        counter++;
                         Edge edges = {obj[j], obj[connections[j][t]]};
                         result.push_back(edges);
+                        //printf("\t EDGE (OR SIDE) to render :SDKfj;ksajdf; asd\n");
                         //printf("\tEDGE TO RENDER: %ld, %d\n", j, connections[j][t]);
+                        vec.push_back(obj[connections[j][t]]);
+                    }
+                    if(counter == 2)
+                    {
+                        tri.push_back(vec);
+                        //printf("TRI SIZE IS %ld = tri.size()\n\n", tri.size());
                     }
                 }
+                //printf("COUNTER IS ......... = %d\n", counter);
             }
         }
     }
