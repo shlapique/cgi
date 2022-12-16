@@ -17,6 +17,14 @@ int main(int argc, char *argv[])
     double scale = 1; // size of obj in "times"
     double scale_time = 1;
 
+    ///-----------
+    const std::vector <SDL_Vertex> verts =
+    {
+        { SDL_FPoint{ 400, 150 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }},
+        { SDL_FPoint{ 200, 450 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }},
+        { SDL_FPoint{ 600, 450 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }}};
+    ///------------
+
     /// default distance (k) from proj to screen
     double k = 600;
 
@@ -59,6 +67,10 @@ int main(int argc, char *argv[])
                 scene.draw(color);
                 mult = 0;
                 //////
+
+                //+++++
+                //SDL_RenderGeometry( renderer, nullptr, verts.data(), verts.size(), nullptr, 0 );
+                //+++++
 
                 SDL_RenderPresent(renderer);
                 while (SDL_PollEvent(&event))

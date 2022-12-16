@@ -133,9 +133,34 @@ void Scene::draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    std::vector <SDL_Vertex> verts = {};
+    unsigned char tri_color_r = 200;
+    unsigned char tri_color_g = 123;
+    unsigned char tri_color_b = 11;
+    // 0 stands for a, 1 stands for b
+    bool flag = 0;
     for(size_t i = 0; i < edges.size(); ++i)
     {
         draw_segment(renderer, edges[i].a, edges[i].b, color);
+        if(verts.size() == 3)
+        {
+            SDL_RenderGeometry(renderer, nullptr, verts.data(), verts.size(), nullptr, 0);
+            verts = {};
+        }
+        else
+        {
+            // then we should work with a
+            if(flag == 0)
+            {
+                verts.push_back({SDL_FPoint{float(edges[i].a.x), float(edges[i].a.y)}, SDL_Color{tri_color_r, tri_color_g, tri_color_b, 255}, SDL_FPoint{0}});
+                flag = 1;
+            }
+            else
+            {
+                verts.push_back({SDL_FPoint{float(edges[i].b.x), float(edges[i].b.y)}, SDL_Color{tri_color_r, tri_color_g, tri_color_b, 255}, SDL_FPoint{0}});
+                flag = 0;
+            }
+        }     
     }
 }
 
