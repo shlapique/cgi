@@ -70,11 +70,9 @@ Point find_origin(int size_x, int size_y, double k)
     return point;
 }
 
-std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj,
-                                    std::vector <std::vector <Point>> &tri)
+std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::vector <int>> connections, std::vector <Point> obj)
 {
     std::vector <Edge> result;
-    tri = {};
     for(size_t i = 0; i < planes.size(); ++i)
     {
         for(size_t j = 0; j < obj.size(); ++j)
@@ -83,29 +81,52 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
             V4 v = {obj[j].x, obj[j].y, obj[j].z, 1};
             if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
             {
-                int counter = 0;
-                std::vector <Point> vec;
-                vec.push_back(obj[j]);
                 for(size_t t = 0; t < connections[j].size(); ++t)
                 {
-                    //printf("SKDRJ:S TEST IN MANY THINGS!!!\n");
                     V4 v1 = {obj[connections[j][t]].x, obj[connections[j][t]].y, obj[connections[j][t]].z, 1};
                     if(std::abs(std::round(scalar_mult(v1, planes[i])*1000)/1000) == 0.000)
                     {
-                        counter++;
                         Edge edges = {obj[j], obj[connections[j][t]]};
                         result.push_back(edges);
-                        //printf("\t EDGE (OR SIDE) to render :SDKfj;ksajdf; asd\n");
-                        //printf("\tEDGE TO RENDER: %ld, %d\n", j, connections[j][t]);
-                        vec.push_back(obj[connections[j][t]]);
-                    }
-                    if(counter == 2)
-                    {
-                        tri.push_back(vec);
-                        //printf("TRI SIZE IS %ld = tri.size()\n\n", tri.size());
                     }
                 }
-                //printf("COUNTER IS ......... = %d\n", counter);
+            }
+        }
+    }
+    return result;
+}
+
+std::vector <std::vector <Point>> tri_to_render(std::vector <V4> planes, std::vector <std::vector <Point>> tri)
+{
+    printf("\t size offfffffffff tir in MSATH = %ld \n", tri.size());
+    std::vector <std::vector <Point>> result;
+    bool flag = true; // green light to push_back in result
+    for(size_t i = 0; i < planes.size(); ++i)
+    {
+        for(size_t j = 0; j < tri.size(); ++j)
+        {
+            std::vector <Point> tmp = {};
+            for(int t = 0; t < tri[j].size(); ++t)
+            {
+                // if point belongs to plane ...
+                V4 v = {tri[j][t].x, tri[j][t].y, tri[j][t].z, 1};
+                if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
+                {
+                    tmp.push_back(tri[j][t]);
+                }
+                else
+                {
+                    flag = false; // ur unable to push in result
+                }
+            }
+            if(flag == true)
+            {
+                result.push_back(tmp);
+            }
+            else
+            {
+                tmp = {};
+                flag = true;
             }
         }
     }
@@ -125,3 +146,30 @@ std::vector <V4> visibility(std::vector <V4> list)
     }
     return result;
 }
+
+/*
+// calculate the center of the circle
+Point center_of_circle(double x1, double x2, double x3, double y1, double y2, double y3)
+{
+    double xc = (0.5 * (((x2 * x2) - (x1 * x1) + (y2 * y2) - (y1 * y1)) * (y3 - y1) - ((x3 * x3) - (x1 * x1) + (y3 * y3) - (y1 * y1)) * (y2 - y1))) / (((x2 - x1) * (y3 - y1)) - ((x3 - x1) * (y2 - y1)));
+    double yc = (0.5 * (((x3 * x3) - (x1 * x1) + (y3 * y3) - (y1 * y1)) * (x2 - x1) - ((x2 * x2) - (x1 * x1) + (y2 * y2) - (y1 * y1)) * (x3 - x1))) / (((x2 - x1) * (y3 - y1)) - ((x3 - x1) * (y2 - y1)));
+    double[] mas = new double[2];
+    mas[0] = xc;
+    mas[1] = yc;
+
+    return mas;
+}
+
+std::vector <std::vector <Point>> delaunay(std::vector <Point> list)
+{
+
+
+
+
+
+
+
+
+
+}
+*/

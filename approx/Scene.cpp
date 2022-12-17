@@ -59,12 +59,14 @@ void Scene::edges_central_projection(Point origin, double k)
 
 void Scene::tri_central_projection(Point origin, double k)
 {
-    for(size_t i = 0; i < tri.size(); ++i)
+    tri_out = tri;
+    for(size_t i = 0; i < tri_out.size(); ++i)
     {
-        this->tri[i] = {real_point(origin, point_central_projection(tri[i][0], k)),
+        this->tri_out[i] = {real_point(origin, point_central_projection(tri[i][0], k)),
                     real_point(origin, point_central_projection(tri[i][1], k)), real_point(origin, point_central_projection(tri[i][2], k))};
     }
 }
+
 
 void Scene::vertex_isometric_projection(Point origin)
 {
@@ -85,7 +87,7 @@ void Scene::edges_isometric_projection(Point origin)
 
 void Scene::isometric_projection(Point origin)
 {
-    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex, tri);
+    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
     edges_isometric_projection(origin);
 }
 
@@ -139,42 +141,36 @@ void Scene::draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 }
 
 
-void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri, Color color)
+void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri_out, Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
-    unsigned char tri_color_r = 200;
-    unsigned char tri_color_g = 123;
-    unsigned char tri_color_b = 11;
     // 0 stands for a, 1 stands for b
-    bool flag = 0;
     for(size_t i = 0; i < edges.size(); ++i)
     {
         draw_segment(renderer, edges[i].a, edges[i].b, color);
-        ///
-        ///
     }
-
- //   printf("TRI SIZE IS %ld = tri.size()\n\n", tri.size());
-    for(size_t j = 0; j < tri.size(); ++j)
+    printf("\t\t SIZE OF TRI IS = %ld\n", tri.size());    
+    for(size_t j = 0; j < tri_out.size(); ++j)
     {
-        //printf("\tCOLORED!\n");
+        printf("RISUIIIIIIIIIIIIIIIIIIIIIIIIIIII\n");
         std::vector <SDL_Vertex> verts =
-        {{SDL_FPoint{(float)tri[j][0].x, (float)tri[j][0].y}, SDL_Color{ tri_color_r, 0, 0, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri[j][1].x, (float)tri[j][1].y}, SDL_Color{tri_color_g, 0, 0, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri[j][2].x, (float)tri[j][2].y}, SDL_Color{tri_color_b, 0, 0, 255 }, SDL_FPoint{ 0 }}};
+        {{SDL_FPoint{(float)tri_out[j][0].x, (float)tri_out[j][0].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][1].x, (float)tri_out[j][1].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][2].x, (float)tri_out[j][2].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }}};
         SDL_RenderGeometry(renderer, nullptr, verts.data(), verts.size(), nullptr, 0);
-        //printf("\tCOLORED!\n");
     }
 }
 
 void Scene::central_projection(Point origin, double k)
 {
-    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex, tri);
+    printf("\t\t SIZE OF TRI IS = %ld\n", tri.size());    
+    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
+    this->tri_out = tri_to_render(visibility(get_planeset(vertex, planeset)), tri);
     edges_central_projection(origin, k);
     tri_central_projection(origin, k);
 }
 
 void Scene::draw(Color color)
 {
-    draw_obj(renderer, edges, tri, color);
+    draw_obj(renderer, edges, tri_out, color);
 }

@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
                 //////
 
                 //+++++
-                //SDL_RenderGeometry( renderer, nullptr, verts.data(), verts.size(), nullptr, 0 );
+
                 //+++++
 
                 SDL_RenderPresent(renderer);

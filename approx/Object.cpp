@@ -125,4 +125,98 @@ void Object::create_trunc_cylinder(double a, double b, double h, int prec)
             }
         }
     }
+
+    //+++++++++++++++++
+    /// here we will triangulate all sides of the object
+    std::vector <V4> planes = get_planeset(vertex, planeset);
+    sides.resize(planeset.size());
+    int counter0 = 0;
+    int counter = 0;
+
+    for(size_t i = 0; i < planes.size(); ++i)
+    {
+        for(size_t j = 0; j < vertex.size(); ++j)
+        {
+            // if point belongs to plane ...
+            V4 v = {vertex[j].x, vertex[j].y, vertex[j].z, 1};
+            if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
+            {
+                sides[i].push_back(vertex[j]);
+                printf("\tINDECIES: %d\n", j);
+            }
+        }
+    } // here we make array in sides
+
+    for(size_t i = 0; i < sides.size(); ++i)
+    {
+        if(i == 0)
+        {
+            printf("I = %d\n", i);
+            tri.push_back({vertex[0], vertex[prec - 1], vertex[2 * prec - 1]}); // 1
+            tri.push_back({vertex[0], vertex[prec], vertex[2 * prec - 1]});     // 2
+        }
+        if(i != 0)
+        {
+            if(i > 0 && i < prec)
+            {
+                tri.push_back({vertex[i], vertex[i - 1], vertex[i - 1 + prec]});
+                tri.push_back({vertex[i], vertex[i + prec], vertex[i - 1 + prec]});
+            }
+
+            if(i == prec)
+            {
+                // number of triangles in poly (n - 2), where n -- number of vertecies
+                for(size_t j = 0; j < sides[i].size(); ++j)
+                { 
+                    if(j == 0)
+                    {
+                        tri.push_back({vertex[0], vertex[1], vertex[2]}); // first 
+                    }
+                    if(j == prec - 2)
+                    {
+                        tri.push_back({vertex[0], vertex[prec - 1], vertex[prec - 2]}); // last triangles of poly
+                    }
+                    else
+                    {
+                        if(j >= 2)
+                        {
+                            tri.push_back({vertex[0], vertex[j - 1], vertex[j]});
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if(i == prec + 1)
+                {
+                    for(size_t j = 0; j < sides[i].size(); ++j)
+                    {
+                        // number of triangles in poly (n - 2), where n -- number of vertecies
+                        if(j == 0)
+                        {
+                            tri.push_back({vertex[prec], vertex[prec + 1], vertex[prec + 2]}); // first 
+                        }
+                        if(j == prec - 2)
+                        {
+                            tri.push_back({vertex[prec], vertex[2 * prec - 1], vertex[2 * prec - 2]}); // last triangles of poly
+                        }
+                        else
+                        {
+                            if(j >= 2)
+                            {
+                            counter++;
+                                tri.push_back({vertex[prec], vertex[prec + j - 1], vertex[prec + j]});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        printf("SIZE OF A SIDE VECTOR of %d plane is = %ld\n", i, sides[i].size());
+    }
+    //+++++++++++++++++
+    
+    printf("SIZE OF A TRI = %ld\n", tri.size());
+    printf("SIZE OF A SIDES = %ld\n", sides.size());
+    printf("COUNTER = %d\n", counter);
 }

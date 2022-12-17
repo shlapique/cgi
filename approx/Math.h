@@ -19,7 +19,9 @@ double dist_stereo(Point, Point);
 
 Point real_point(Point, Point);
 Point find_origin(int, int, double);
-std::vector <Edge> edges_to_render(std::vector <V4>, std::vector <std::vector <int>>, std::vector <Point>, std::vector <std::vector <Point>> &);
+std::vector <Edge> edges_to_render(std::vector <V4>, std::vector <std::vector <int>>, std::vector <Point>);
+std::vector <std::vector <Point>> tri_to_render(std::vector <V4>, std::vector <std::vector <Point>>);
 std::vector <V4> visibility(std::vector <V4>);
+std::vector <std::vector <Point>> delaunay(std::vector <Point>);
 
 #endif
