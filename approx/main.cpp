@@ -29,9 +29,10 @@ int main(int argc, char *argv[])
     double k = 600;
 
     //Color color = {231, 222, 111};
-    //Color color = {2, 0, 200};
-    Color color = {155, 38, 182};
-    
+    //Color color_carcas = {155, 38, 182};
+    Color color_carcas = {2, 0, 200};
+    Color color_sides = {231, 222, 111};
+
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
     {
         SDL_Window *window = NULL;
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
                 //////
                 scene.rotate(axis, mult, dir, k);
                 scene.central_projection(origin, k);
-                scene.draw(color);
+                scene.draw(color_carcas, color_sides);
                 mult = 0;
                 //////
 

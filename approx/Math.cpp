@@ -96,9 +96,8 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
     return result;
 }
 
-std::vector <std::vector <Point>> tri_to_render(std::vector <V4> planes, std::vector <std::vector <Point>> tri)
+std::vector <std::vector <Point>> tri_to_render(std::vector <V4> planes, std::vector <std::vector <int>> tri, std::vector <Point> obj)
 {
-    printf("\t size offfffffffff tir in MSATH = %ld \n", tri.size());
     std::vector <std::vector <Point>> result;
     bool flag = true; // green light to push_back in result
     for(size_t i = 0; i < planes.size(); ++i)
@@ -106,13 +105,13 @@ std::vector <std::vector <Point>> tri_to_render(std::vector <V4> planes, std::ve
         for(size_t j = 0; j < tri.size(); ++j)
         {
             std::vector <Point> tmp = {};
-            for(int t = 0; t < tri[j].size(); ++t)
+            for(int t = 0; t < tri[j].size(); ++t) // t = {0 .. 2}
             {
                 // if point belongs to plane ...
-                V4 v = {tri[j][t].x, tri[j][t].y, tri[j][t].z, 1};
+                V4 v = {obj[tri[j][t]].x, obj[tri[j][t]].y, obj[tri[j][t]].z, 1};
                 if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) == 0.000)
                 {
-                    tmp.push_back(tri[j][t]);
+                    tmp.push_back(obj[tri[j][t]]);
                 }
                 else
                 {

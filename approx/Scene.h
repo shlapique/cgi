@@ -32,10 +32,10 @@ class Scene : public Object
         void transform(double);
 
         void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color);
-        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>>, Color color);
+        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>>, Color, Color);
 
         //=====
-        void draw(Color color);
+        void draw(Color color_carcas, Color color_sides);
 
     private:
         SDL_Renderer *renderer = NULL; 
@@ -48,7 +48,7 @@ class Scene : public Object
         double k = 600;
         Color color = {231, 222, 111};
         std::vector <Edge> edges;
-        std::vector <std::vector <Point>> tri; // array of triangles for color and poly mesh
+        std::vector <std::vector <Point>> tri_out; // tri out to draw()
 };
 
 #endif

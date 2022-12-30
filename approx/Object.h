@@ -17,9 +17,8 @@ class Object
         std::vector <Point> vertex;
         std::vector <std::vector <int>> planeset;
         std::vector <std::vector <int>> connections;
-        std::vector <std::vector <Point>> tri; // triangles after triangulation
-        std::vector <std::vector <Point>> tri_out; // tri out to draw()
-        std::vector <std::vector <Point>> sides; // sides of poly
+        std::vector <std::vector <int>> tri; // triangles after triangulation
+        std::vector <std::vector <int>> sides; // sides of poly
 };
 
 #endif

@@ -59,11 +59,10 @@ void Scene::edges_central_projection(Point origin, double k)
 
 void Scene::tri_central_projection(Point origin, double k)
 {
-    tri_out = tri;
     for(size_t i = 0; i < tri_out.size(); ++i)
     {
-        this->tri_out[i] = {real_point(origin, point_central_projection(tri[i][0], k)),
-                    real_point(origin, point_central_projection(tri[i][1], k)), real_point(origin, point_central_projection(tri[i][2], k))};
+        this->tri_out[i] = {real_point(origin, point_central_projection(tri_out[i][0], k)),
+                    real_point(origin, point_central_projection(tri_out[i][1], k)), real_point(origin, point_central_projection(tri_out[i][2], k))};
     }
 }
 
@@ -141,36 +140,46 @@ void Scene::draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 }
 
 
-void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri_out, Color color)
+void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri_out, Color color_carcas, Color color_sides)
 {
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, color_carcas.r, color_carcas.g, color_carcas.b, SDL_ALPHA_OPAQUE);
     // 0 stands for a, 1 stands for b
     for(size_t i = 0; i < edges.size(); ++i)
     {
-        draw_segment(renderer, edges[i].a, edges[i].b, color);
+        draw_segment(renderer, edges[i].a, edges[i].b, color_carcas);
     }
-    printf("\t\t SIZE OF TRI IS = %ld\n", tri.size());    
+
+    SDL_SetRenderDrawColor(renderer, color_sides.r, color_sides.g, color_sides.b, SDL_ALPHA_OPAQUE);
     for(size_t j = 0; j < tri_out.size(); ++j)
     {
-        printf("RISUIIIIIIIIIIIIIIIIIIIIIIIIIIII\n");
         std::vector <SDL_Vertex> verts =
-        {{SDL_FPoint{(float)tri_out[j][0].x, (float)tri_out[j][0].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri_out[j][1].x, (float)tri_out[j][1].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri_out[j][2].x, (float)tri_out[j][2].y}, SDL_Color{color.r, color.g, color.b, 255 }, SDL_FPoint{ 0 }}};
+        {{SDL_FPoint{(float)tri_out[j][0].x, (float)tri_out[j][0].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][1].x, (float)tri_out[j][1].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][2].x, (float)tri_out[j][2].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }}};
         SDL_RenderGeometry(renderer, nullptr, verts.data(), verts.size(), nullptr, 0);
     }
 }
 
 void Scene::central_projection(Point origin, double k)
 {
-    printf("\t\t SIZE OF TRI IS = %ld\n", tri.size());    
     this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
-    this->tri_out = tri_to_render(visibility(get_planeset(vertex, planeset)), tri);
+    this->tri_out = tri_to_render(visibility(get_planeset(vertex, planeset)), tri, vertex);
     edges_central_projection(origin, k);
     tri_central_projection(origin, k);
 }
 
-void Scene::draw(Color color)
+void Scene::draw(Color color_carcas, Color color_sides)
 {
-    draw_obj(renderer, edges, tri_out, color);
+    draw_obj(renderer, edges, tri_out, color_carcas, color_sides);
+    /*
+    for(size_t t = 0; t < tri_out.size(); ++t)
+    {
+        printf(" [%ld] : {", t);
+        for(size_t m = 0; m < tri_out[t].size(); ++m)
+        {
+            printf(" %f %f %f, ", tri_out[t][m].x, tri_out[t][m].y, tri_out[t][m].z);
+        }
+        printf(" }\n");
+    }
+    */
 }
