@@ -96,8 +96,8 @@ void Object::create_trunc_cylinder(double a, double b, double h, int prec)
             this->planeset.push_back({i, i - 1, i - 1 + prec});
         }
     }
-    this->planeset.push_back({0, 1, 2});
-    this->planeset.push_back({2 * prec - 1, 2 * prec - 2, 2 * prec - 3});
+    this->planeset.push_back({0, prec / 2 + 1, prec / 2 + 2});
+    this->planeset.push_back({prec + prec / 2 + 2, prec + prec / 2 + 1, prec});
 
     for(int i = 0; i < prec * 2; ++i)
     {

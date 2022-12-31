@@ -32,7 +32,7 @@ class Scene : public Object
         void transform(double);
 
         void draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color);
-        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>>, Color, Color);
+        void draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>>, std::vector <double>, Color, Color);
 
         //=====
         void draw(Color color_carcas, Color color_sides);
@@ -49,6 +49,7 @@ class Scene : public Object
         Color color = {231, 222, 111};
         std::vector <Edge> edges;
         std::vector <std::vector <Point>> tri_out; // tri out to draw()
+        std::vector <double> bright; // brightness of each triangle with corresp index
 };
 
 #endif

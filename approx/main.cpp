@@ -17,21 +17,13 @@ int main(int argc, char *argv[])
     double scale = 1; // size of obj in "times"
     double scale_time = 1;
 
-    ///-----------
-    const std::vector <SDL_Vertex> verts =
-    {
-        { SDL_FPoint{ 400, 150 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }},
-        { SDL_FPoint{ 200, 450 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }},
-        { SDL_FPoint{ 600, 450 }, SDL_Color{ 255, 0, 0, 255 }, SDL_FPoint{ 0 }}};
-    ///------------
-
     /// default distance (k) from proj to screen
     double k = 600;
 
-    //Color color = {231, 222, 111};
-    //Color color_carcas = {155, 38, 182};
     Color color_carcas = {2, 0, 200};
-    Color color_sides = {231, 222, 111};
+    //Color color_sides = {155, 38, 182};
+    Color color_sides = {84, 36, 61};
+    //Color color_sides = {231, 222, 111};
 
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
     {
@@ -44,7 +36,7 @@ int main(int argc, char *argv[])
 
             //+++++++++++++++
             Scene scene(renderer);
-            scene.create_trunc_cylinder(500, 300, 500, 100);
+            scene.create_trunc_cylinder(500, 300, 500, 30);
             //+++++++++++++++
 
             while (!done) 

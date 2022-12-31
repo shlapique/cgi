@@ -140,7 +140,7 @@ void Scene::draw_segment(SDL_Renderer *renderer, Point a, Point b, Color color)
 }
 
 
-void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri_out, Color color_carcas, Color color_sides)
+void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vector <std::vector <Point>> tri_out, std::vector <double> bright, Color color_carcas, Color color_sides)
 {
     SDL_SetRenderDrawColor(renderer, color_carcas.r, color_carcas.g, color_carcas.b, SDL_ALPHA_OPAQUE);
     // 0 stands for a, 1 stands for b
@@ -152,34 +152,28 @@ void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vect
     SDL_SetRenderDrawColor(renderer, color_sides.r, color_sides.g, color_sides.b, SDL_ALPHA_OPAQUE);
     for(size_t j = 0; j < tri_out.size(); ++j)
     {
+        Uint8 real_r = color_sides.r * bright[j] / 100;
+        Uint8 real_g = color_sides.g * bright[j] / 100;
+        Uint8 real_b = color_sides.b * bright[j] / 100;
         std::vector <SDL_Vertex> verts =
-        {{SDL_FPoint{(float)tri_out[j][0].x, (float)tri_out[j][0].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri_out[j][1].x, (float)tri_out[j][1].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }},
-            {SDL_FPoint{(float)tri_out[j][2].x, (float)tri_out[j][2].y}, SDL_Color{color_sides.r, color_sides.g, color_sides.b, 255 }, SDL_FPoint{ 0 }}};
+        {{SDL_FPoint{(float)tri_out[j][0].x, (float)tri_out[j][0].y}, SDL_Color{real_r, real_g, real_b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][1].x, (float)tri_out[j][1].y}, SDL_Color{real_r, real_g, real_b, 255 }, SDL_FPoint{ 0 }},
+            {SDL_FPoint{(float)tri_out[j][2].x, (float)tri_out[j][2].y}, SDL_Color{real_r, real_g, real_b, 255 }, SDL_FPoint{ 0 }}};
         SDL_RenderGeometry(renderer, nullptr, verts.data(), verts.size(), nullptr, 0);
     }
 }
 
 void Scene::central_projection(Point origin, double k)
 {
-    this->edges = edges_to_render(visibility(get_planeset(vertex, planeset)), connections, vertex);
-    this->tri_out = tri_to_render(visibility(get_planeset(vertex, planeset)), tri, vertex);
+    std::vector <V4> visible_planesets = visibility(get_planeset(vertex, planeset));
+    this->edges = edges_to_render(visible_planesets, connections, vertex);
+    this->tri_out = tri_to_render(visible_planesets, tri, vertex);
+    this->bright = brightness(visible_planesets, tri_out);
     edges_central_projection(origin, k);
     tri_central_projection(origin, k);
 }
 
 void Scene::draw(Color color_carcas, Color color_sides)
 {
-    draw_obj(renderer, edges, tri_out, color_carcas, color_sides);
-    /*
-    for(size_t t = 0; t < tri_out.size(); ++t)
-    {
-        printf(" [%ld] : {", t);
-        for(size_t m = 0; m < tri_out[t].size(); ++m)
-        {
-            printf(" %f %f %f, ", tri_out[t][m].x, tri_out[t][m].y, tri_out[t][m].z);
-        }
-        printf(" }\n");
-    }
-    */
+    draw_obj(renderer, edges, tri_out, bright, color_carcas, color_sides);
 }

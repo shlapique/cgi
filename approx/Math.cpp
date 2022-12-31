@@ -24,7 +24,7 @@ V4 plane_equation(Point p1, Point p2, Point p3)
 
     Point minors= {(p2.y * p3.z - p3.y * p2.z), (p2.x * p3.z - p3.x * p2.z), (p2.x * p3.y - p3.x * p2.y)};
     V4 result = {minors.x, -minors.y, minors.z, p1.x * minors.x + (-1) * p1.y * minors.y + p1.z * minors.z};
-    //printf("%f, %f, %f, %f", result.a, result.b, result.c, result.d);
+    //printf("%f, %f, %f, %f \n", result.a, result.b, result.c, result.d);
     return result;
 }
 
@@ -96,6 +96,49 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
     return result;
 }
 
+// here we take visible sides (equations of planes) 
+// and mesure brightness (from max -> min)
+std::vector <double> brightness(std::vector <V4> planes, std::vector <std::vector <Point>> tri_out)
+{
+    V4 vec = {0, 0, -600, 1};
+    std::vector <double> result(tri_out.size());
+    double max = -1;
+
+    bool flag = true; // means, that all 3 verticies are on current plane
+    for(size_t i = 0; i < planes.size(); ++i)
+    {
+        for(size_t j = 0; j < tri_out.size(); ++j)
+        {
+            for(int t = 0; t < tri_out[j].size(); ++t) // t = {0 .. 2}
+            {
+                // if point belongs to plane ...
+                V4 v = {tri_out[j][t].x, tri_out[j][t].y, tri_out[j][t].z, 1};
+                if(std::abs(std::round(scalar_mult(v, planes[i])*1000)/1000) != 0.000)
+                {
+                    flag = false; 
+                }
+            }
+            if(flag == true)
+            {
+                result[j] = scalar_mult(vec, planes[i]);
+                if(result[j] > max)
+                {
+                    max = result[j];
+                }
+            }
+            else
+            {
+                flag = true;
+            }
+        }
+    }
+    for(size_t i = 0; i < result.size(); ++i)
+    {
+        result[i] = std::round(result[i] * 100 / max * 100)/100;
+    }
+    return result;
+}
+
 std::vector <std::vector <Point>> tri_to_render(std::vector <V4> planes, std::vector <std::vector <int>> tri, std::vector <Point> obj)
 {
     std::vector <std::vector <Point>> result;
@@ -146,29 +189,3 @@ std::vector <V4> visibility(std::vector <V4> list)
     return result;
 }
 
-/*
-// calculate the center of the circle
-Point center_of_circle(double x1, double x2, double x3, double y1, double y2, double y3)
-{
-    double xc = (0.5 * (((x2 * x2) - (x1 * x1) + (y2 * y2) - (y1 * y1)) * (y3 - y1) - ((x3 * x3) - (x1 * x1) + (y3 * y3) - (y1 * y1)) * (y2 - y1))) / (((x2 - x1) * (y3 - y1)) - ((x3 - x1) * (y2 - y1)));
-    double yc = (0.5 * (((x3 * x3) - (x1 * x1) + (y3 * y3) - (y1 * y1)) * (x2 - x1) - ((x2 * x2) - (x1 * x1) + (y2 * y2) - (y1 * y1)) * (x3 - x1))) / (((x2 - x1) * (y3 - y1)) - ((x3 - x1) * (y2 - y1)));
-    double[] mas = new double[2];
-    mas[0] = xc;
-    mas[1] = yc;
-
-    return mas;
-}
-
-std::vector <std::vector <Point>> delaunay(std::vector <Point> list)
-{
-
-
-
-
-
-
-
-
-
-}
-*/
