@@ -19,6 +19,13 @@ struct V4
     double d;  
 };
 
+struct V3
+{
+    double x;  
+    double y;  
+    double z;  
+};
+
 struct Color
 {
     unsigned char r;

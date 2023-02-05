@@ -223,9 +223,9 @@ int main(int argc, char *argv[])
     Color coord_color = {2, 0, 200};
 
     //
-    printf("ENTER (a, b) parameter = ");
+    printf("ENTER a parameter = ");
     scanf("%lf", &a);
-    scanf("%lf", &b);
+    //scanf("%lf", &b);
     //
     
     if (SDL_Init(SDL_INIT_VIDEO) == 0) 
@@ -253,11 +253,11 @@ int main(int argc, char *argv[])
                 draw_coords(renderer, size_x, size_y, 1 / (mult * 100), coord_color);
 
                 ////
-                //draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
+                draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 // draw(renderer, flower(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
                 // draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
                 // draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
-                draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color);
+                //draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color);
                 ////
 
                 SDL_RenderPresent(renderer);

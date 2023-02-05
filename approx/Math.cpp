@@ -7,6 +7,24 @@ double scalar_mult(V4 vec1, V4 vec2)
     return result;
 }
 
+double scalar_mult(V3 vec1, V3 vec2)
+{
+    double result = vec1.x * vec2.x + vec1.y * vec2.y
+                    + vec1.z * vec2.z;
+    return result;
+}
+
+V3 scalar_mult(V3 vec, double a)
+{
+    return {vec.x * a, vec.y * a, vec.z * a};
+}
+
+//for normalize(V4)
+V3 scalar_mult(V4 vec, double g)
+{
+    return {vec.a * g, vec.b * g, vec.c * g};
+}
+
 Point polar_to_dec(double ro, double phi)
 {
     Point point;
@@ -57,6 +75,17 @@ double dist_stereo(Point p1, Point p2)
     return result;
 }
 
+V3 normalize(V3 vec)
+{
+    double inv_length = 1.0 / std::sqrt(std::pow(vec.x, 2) + std::pow(vec.y, 2) + std::pow(vec.z, 2));
+    return scalar_mult(vec, inv_length);
+}
+
+V3 normalize(V4 vec)
+{
+    double inv_length = 1.0 / std::sqrt(std::pow(vec.a, 2) + std::pow(vec.b, 2) + std::pow(vec.c, 2));
+    return scalar_mult(vec, inv_length);
+}
 Point real_point(Point origin, Point a)
 {   
     Point point = {origin.x + a.x, origin.y - a.y, origin.z + a.z};
@@ -100,7 +129,7 @@ std::vector <Edge> edges_to_render(std::vector <V4> planes, std::vector <std::ve
 // and mesure brightness (from max -> min)
 std::vector <double> brightness(std::vector <V4> planes, std::vector <std::vector <Point>> tri_out)
 {
-    V4 vec = {0, 0, -600, 1};
+    V3 vec = {0, 0, -600};
     std::vector <double> result(tri_out.size());
     double max = -1;
 
@@ -109,7 +138,7 @@ std::vector <double> brightness(std::vector <V4> planes, std::vector <std::vecto
     {
         for(size_t j = 0; j < tri_out.size(); ++j)
         {
-            for(int t = 0; t < tri_out[j].size(); ++t) // t = {0 .. 2}
+            for(size_t t = 0; t < tri_out[j].size(); ++t) // t = {0 .. 2}
             {
                 // if point belongs to plane ...
                 V4 v = {tri_out[j][t].x, tri_out[j][t].y, tri_out[j][t].z, 1};
@@ -120,7 +149,7 @@ std::vector <double> brightness(std::vector <V4> planes, std::vector <std::vecto
             }
             if(flag == true)
             {
-                result[j] = scalar_mult(vec, planes[i]);
+                result[j] = scalar_mult(vec, normalize(planes[i]));
                 if(result[j] > max)
                 {
                     max = result[j];

@@ -146,7 +146,7 @@ void Scene::draw_obj(SDL_Renderer *renderer, std::vector <Edge> edges, std::vect
     // 0 stands for a, 1 stands for b
     for(size_t i = 0; i < edges.size(); ++i)
     {
-        draw_segment(renderer, edges[i].a, edges[i].b, color_carcas);
+        //draw_segment(renderer, edges[i].a, edges[i].b, color_carcas);
     }
 
     SDL_SetRenderDrawColor(renderer, color_sides.r, color_sides.g, color_sides.b, SDL_ALPHA_OPAQUE);
