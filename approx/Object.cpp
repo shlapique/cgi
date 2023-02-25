@@ -99,10 +99,10 @@ void Object::create_trunc_cylinder(double a, double b, double h, int prec)
     this->planeset.push_back({0, prec / 2 + 1, prec / 2 + 2});
     this->planeset.push_back({prec + prec / 2 + 2, prec + prec / 2 + 1, prec});
 
-    for(int i = 0; i < prec * 2; ++i)
+    for(int i = 0; i < (int)vertex.size(); ++i)
     {
         if(i == 0)
-            this->connections.push_back({prec - 1, i + 1, i + prec});
+            this->connections.push_back({prec - 1, 1, prec});
         else 
         { 
             if (i == prec - 1)
@@ -117,11 +117,24 @@ void Object::create_trunc_cylinder(double a, double b, double h, int prec)
                         this->connections.push_back({i - 1, prec, prec - 1});
                     else
                     {
-                        this->connections.push_back({i - 1, i + 1, i + prec});
+                        if (i < prec)
+                            this->connections.push_back({i - 1, i + 1, i + prec});
+                        else
+                            this->connections.push_back({i - 1, i + 1, i - prec});
                     }
                 }
             }
         }
+    }
+
+    for(size_t i = 0; i < connections.size(); ++i)
+    {
+        printf("CONNECTIONS [%d]: ", i);
+        for(size_t j = 0; j < connections[i].size(); ++j)
+        {
+            printf(" %d", connections[i][j]);
+        }
+        printf("\n");
     }
 
     //+++++++++++++++++
