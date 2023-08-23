@@ -20,6 +20,14 @@ struct Color
     unsigned char b;
 };
 
+struct Solution
+{
+    int x;
+    int y;
+    double X;
+    /* double f; */
+};
+
 
 Point polar_to_dec(double ro, double phi)
 {
@@ -27,6 +35,22 @@ Point polar_to_dec(double ro, double phi)
     point.rx = ro * std::cos(phi);
     point.ry = ro * std::sin(phi);
     return point;
+}
+
+void render_text(SDL_Renderer *renderer, int x, int y, char *text,
+                TTF_Font *font, SDL_Rect *rect, SDL_Color *color)
+{
+    SDL_Surface *surface;
+    SDL_Texture *texture;
+    surface = TTF_RenderText_Solid(font, text, *color);
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    rect->x = x;
+    rect->y = y;
+    rect->w = surface->w;
+    rect->h = surface->h;
+    SDL_FreeSurface(surface);
+    SDL_RenderCopy(renderer, texture, NULL, rect);
+    SDL_DestroyTexture(texture);
 }
 
 
@@ -71,7 +95,7 @@ void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32
 }
 
 
-void draw(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, int size_x, int size_y, Color color)
+void draw(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, std::vector <Solution> sol, int size_x, int size_y, Color color, TTF_Font * font, SDL_Color * text_color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
 
@@ -83,6 +107,15 @@ void draw(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, int size_
         SDL_RenderDrawLine(renderer, prevx, prevy, vec[i][0], vec[i][1]);
         prevx = vec[i][0];
         prevy = vec[i][1];
+        
+    }
+    printf("SIZE OF SOLUTIONS IS %ld \n", sol.size());
+    for(size_t i = 0; i < sol.size(); ++i)
+    {
+        char text[200];
+        SDL_Rect rect;
+        sprintf(text, "%f", sol[i].X); 
+        render_text(renderer, sol[i].x, sol[i].y + 2, text, font, &rect, text_color);
     }
 }
 
@@ -164,6 +197,43 @@ std::vector <std::vector <int>> ellipse(int size_x, int size_y, Point origin, do
     return vec;
 }
 
+std::vector <std::vector <int>> exp(int size_x, int size_y, Point origin, double prec, std::vector <Solution> &sol)
+{
+    /* e^{x} - x^{3} + 3x^{2} - 2x - 3 = 0 */
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        /* f = std::pow(i * prec, 3) + std::pow(i * prec, 2) - 2 * i * prec - 1; */
+        f = std::exp(i * prec) - std::pow(i * prec, 3) + 3 * std::pow(i * prec, 2) - 2 * i * prec - 3;
+        /* f = std::exp(i * prec); */
+        printf("f = %f \n", f);
+        printf("prec = %f \n", prec);
+
+        x = origin.x + i;
+        y = size_y - origin.y - (int)std::round(f * (1 / prec));
+        if(x >= 0 && y >= 0)
+
+        {
+            if(x < 2000 && y < 2000)
+            {
+                /* find soulutions */
+                /* if(std::abs((int)((f - prec) / prec)) <= prec) */
+                if(std::abs((int)(f / prec) * prec) <= prec)
+                {
+                    printf("FOUND ZERO ! f = %f, round(f / prec) * prec) = %f", f, std::round(f / prec) * prec);
+                    Solution s = {x, y, i * prec};
+                    vec.push_back({x, y});
+                    sol.push_back(s);
+                }
+                else
+                    vec.push_back({x , y});
+            }
+        }
+    }
+    return vec;
+}
 
 Point origin(int size_x, int size_y)
 {
@@ -222,9 +292,18 @@ int main(int argc, char *argv[])
     Color color = {231, 222, 111};
     Color coord_color = {2, 0, 200};
 
-    //
-    printf("ENTER a parameter = ");
-    scanf("%lf", &a);
+    char text[200];
+    SDL_Color text_color{155, 38, 182, 255};
+    TTF_Init();
+    TTF_Font * font = TTF_OpenFont("./font/SweetsSmile.ttf", 23);
+    if (font == NULL)
+    {
+        printf("error ! font not found\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* printf("ENTER a parameter = "); */
+    /* scanf("%lf", &a); */
     //scanf("%lf", &b);
     //
     
@@ -253,11 +332,14 @@ int main(int argc, char *argv[])
                 draw_coords(renderer, size_x, size_y, 1 / (mult * 100), coord_color);
 
                 ////
-                draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
-                // draw(renderer, flower(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color);
-                // draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
-                // draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
-                //draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color);
+                /* draw(renderer, cardioid(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color); */
+                /* draw(renderer, flower(size_x, size_y, point, (1 / (mult * 100)), a), size_x, size_y, color); */
+                /* draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
+                /* draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
+                /* draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color); */
+                std::vector <Solution> solutions;
+                std::vector <std::vector <int>> vec = exp(size_x, size_y, point, (1 / (mult * 100)), solutions);
+                draw(renderer, vec, solutions, size_x, size_y, color, font, &text_color); 
                 ////
 
                 SDL_RenderPresent(renderer);
