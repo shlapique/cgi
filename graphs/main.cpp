@@ -55,9 +55,9 @@ void render_text(SDL_Renderer *renderer, int x, int y, char *text,
 
 
 //midpoint circle algorithm
-void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius)
+void draw_circle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius, Color color)
 {
-   SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
    const int32_t diameter = (radius * 2);
 
    int32_t x = (radius - 1);
@@ -118,6 +118,12 @@ void draw(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, int size_
     /*     sprintf(text, "%f", sol[i].X); */ 
     /*     render_text(renderer, sol[i].x, sol[i].y + 2, text, font, &rect, text_color); */
     /* } */
+}
+
+void draw_tabular(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, int size_x, int size_y, Color color)
+{
+    for(size_t i = 0; i < vec.size(); ++i)
+        draw_circle(renderer, vec[i][0], vec[i][1], 7, color);
 }
 
 
@@ -302,6 +308,57 @@ std::vector <std::vector <int>> exp(int size_x, int size_y, Point origin, double
     return vec;
 }
 
+std::vector <std::vector <int>> mnk1(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        /* f = 0.471276 + 0.317708 * i * prec; */
+        f = 1.57079 - 0.325699 * i * prec;
+        x = origin.x + i;
+        y = size_y - origin.y - (int)std::round(f * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> mnk2(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        /* f = 0.129443 + 0.619325 * i * prec - 0.0354844 * std::pow(i * prec, 2); */
+        f = 1.57079 - 0.325699 * i * prec + 2.23214 * 0.0000001 * std::pow(i * prec, 2);
+        x = origin.x + i;
+        y = size_y - origin.y - (int)std::round(f * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> f_tabular(int size_x, int size_y, Point origin, double prec)
+{
+    /* std::vector <std::vector <double>> tabular = {{0, 0}, {1.7, 1.3038}, {3.4, 1.8439}, {5.1, 2.2583}, */
+    /*     {6.8, 2.6077}, {8.5, 2.9155}}; */
+    std::vector <std::vector <double>> tabular = {{-5, 2.9442}, {-3, 2.8198}, {-1, 2.3562}, {1, 0.78540}, 
+        {3, 0.32175}, {5, 0.19740}};
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+
 Point origin(int size_x, int size_y)
 {
     Point point = {size_x / 2, size_y / 2};
@@ -317,8 +374,8 @@ void draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec, Co
     for(int i = 1; i < size_x / 2; i += 1 / prec)
     {
         ii++;
-        draw_circle(renderer, origin(size_x, size_y).x + i, origin(size_x, size_y).y, 4);
-        draw_circle(renderer, origin(size_x, size_y).x - i, origin(size_x, size_y).y, 4);
+        draw_circle(renderer, origin(size_x, size_y).x + i, origin(size_x, size_y).y, 4, {255, 0, 0});
+        draw_circle(renderer, origin(size_x, size_y).x - i, origin(size_x, size_y).y, 4, {255, 0, 0});
         char text[200];
         char ttext[200];
         SDL_Rect rect;
@@ -332,8 +389,8 @@ void draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec, Co
     for(int j = 1; j < size_y / 2; j += 1 / prec)
     {
         jj++;
-        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y - j, 4);
-        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y + j, 4);
+        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y - j, 4, {255, 0, 0});
+        draw_circle(renderer, origin(size_x, size_y).x, origin(size_x, size_y).y + j, 4, {255, 0, 0});
         char text[200];
         char ttext[200];
         SDL_Rect rect;
@@ -374,6 +431,14 @@ int main(int argc, char *argv[])
     double b = 10;
     double mult = 1;
     Color color = {231, 222, 111};
+
+    Color color_f1 = {102, 232, 237};
+    Color color_f2 = {237, 188, 102};
+
+    Color color_mnk1 = {237, 102, 178};
+    Color color_mnk2 = {115, 89, 176};
+    Color color_tabular = {162, 229, 112};
+
     Color coord_color = {2, 0, 200};
 
     char text[200];
@@ -421,8 +486,14 @@ int main(int argc, char *argv[])
                 /* draw(renderer, parabola(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
                 /* draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
                 /* draw(renderer, asin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
-                draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
-                draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color);
+
+                /* draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f1); */
+                /* draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f2); */
+
+                draw(renderer, mnk1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk1);
+                draw(renderer, mnk2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk2);
+                draw_tabular(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_tabular);
+
                 /* draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color); */
 
                 /* std::vector <Solution> solutions; */
