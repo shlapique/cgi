@@ -185,17 +185,34 @@ std::vector <std::vector <int>> f2(int size_x, int size_y, Point origin, double 
 }
 
 
+// std::vector <std::vector <int>> f1(int size_x, int size_y, Point origin, double prec)
+// {
+//     std::vector <std::vector <int>> vec;
+//     double f;
+//     int x, y;
+//     for(int i = origin.x - size_x; i < size_x; ++i)
+//     {
+//         /* x - cos(y) = 2 */
+//         f = std::acos(i * prec - 2);
+//         y = size_y - origin.y - (int)std::round(f * (1 / prec));
+//         x = origin.x + i;
+//         vec.push_back({x , y});
+//     }
+//     return vec;
+// }
+
 std::vector <std::vector <int>> f1(int size_x, int size_y, Point origin, double prec)
 {
     std::vector <std::vector <int>> vec;
     double f;
     int x, y;
-    for(int i = origin.x - size_x; i < size_x; ++i)
+    for(int i = origin.y - size_y; i < size_y; ++i)
     {
         /* x - cos(y) = 2 */
-        f = std::acos(i * prec - 2);
-        y = size_y - origin.y - (int)std::round(f * (1 / prec));
-        x = origin.x + i;
+        // f = std::acos(i * prec - 2);
+        f = 2 + std::cos(i * prec);
+        x = size_x - origin.x + (int)std::round(f * (1 / prec));
+        y = origin.y + i;
         vec.push_back({x , y});
     }
     return vec;
@@ -320,8 +337,8 @@ void draw_coords(SDL_Renderer *renderer, int size_x, int size_y, double prec, Co
         char text[200];
         char ttext[200];
         SDL_Rect rect;
-        sprintf(text, "%d", jj); 
-        sprintf(ttext, "%d", -jj); 
+        sprintf(text, "%d", -jj); 
+        sprintf(ttext, "%d", jj); 
         render_text(renderer, origin(size_x, size_y).x - 2, origin(size_x, size_y).y + j, text, font, &rect, text_color);
         render_text(renderer, origin(size_x, size_y).x - 2, origin(size_x, size_y).y - j, ttext, font, &rect, text_color);
     }
