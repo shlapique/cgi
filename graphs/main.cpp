@@ -358,6 +358,75 @@ std::vector <std::vector <int>> f_tabular(int size_x, int size_y, Point origin, 
     return vec;
 }
 
+std::vector <std::vector <int>> qspline1(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        if(i * prec >= -3 && i * prec < -1)
+        {
+            f = 2.819800 + -0.047003 * (i * prec + 3.000000) + 0.000000 * std::pow(i * prec + 3.000000, 2) + -0.046199*std::pow(i * prec + 3.000000, 3);
+            x = origin.x + i;
+            y = size_y - origin.y - (int)std::round(f * (1 / prec));
+            vec.push_back({x, y});
+        }
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> qspline2(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        if(i * prec >= -1 && i * prec < 1)
+        {
+            f = 2.356200 + -0.601395 * (i * prec - -1.000000) + -0.277196 * std::pow(i * prec - -1.000000, 2) + 0.092597 * std::pow(i * prec - -1.000000, 3);
+            x = origin.x + i;
+            y = size_y - origin.y - (int)std::round(f * (1 / prec));
+            vec.push_back({x, y});
+        }
+    }
+    return vec;
+}
+std::vector <std::vector <int>> qspline3(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        if(i * prec >= 1 && i * prec <= 3)
+        {
+            f = 0.785400 + -0.599019 * (i * prec - 1.000000) + 0.278384 * std::pow(i * prec - 1.000000, 2) + -0.047394 * std::pow(i * prec - 1.000000, 3);
+            x = origin.x + i;
+            y = size_y - origin.y - (int)std::round(f * (1 / prec));
+            vec.push_back({x, y});
+        }
+    }
+    return vec;
+}
+std::vector <std::vector <int>> qspline4(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        if(i * prec >= 3 && i * prec <= 5)
+        {
+            f = 0.321750 + -0.054205 * (i * prec - 3.000000) + -0.005977 * std::pow(i * prec - 3.000000, 2) + 0.000996 * std::pow(i * prec - 3.000000, 3);
+            x = origin.x + i;
+            y = size_y - origin.y - (int)std::round(f * (1 / prec));
+            vec.push_back({x, y});
+        }
+    }
+    return vec;
+}
 
 Point origin(int size_x, int size_y)
 {
@@ -439,6 +508,12 @@ int main(int argc, char *argv[])
     Color color_mnk2 = {115, 89, 176};
     Color color_tabular = {162, 229, 112};
 
+    Color color_s1 = {255, 255, 255};
+    Color color_s2 = {106, 147, 208};
+    Color color_s3 = {55, 139, 64};
+    Color color_s4 = {94, 64, 160};
+
+
     Color coord_color = {2, 0, 200};
 
     char text[200];
@@ -487,12 +562,17 @@ int main(int argc, char *argv[])
                 /* draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
                 /* draw(renderer, asin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
 
-                /* draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f1); */
-                /* draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f2); */
+                // draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f1);
+                // draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f2);
 
-                draw(renderer, mnk1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk1);
-                draw(renderer, mnk2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk2);
-                draw_tabular(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_tabular);
+                draw(renderer, qspline1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s1);
+                draw(renderer, qspline2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s2);
+                draw(renderer, qspline3(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s3);
+                draw(renderer, qspline4(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s4);
+
+                // draw(renderer, mnk1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk1);
+                // draw(renderer, mnk2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk2);
+                // draw_tabular(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_tabular);
 
                 /* draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color); */
 
