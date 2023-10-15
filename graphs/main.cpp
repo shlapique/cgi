@@ -126,7 +126,6 @@ void draw_tabular(SDL_Renderer *renderer, std::vector <std::vector <int>> vec, i
         draw_circle(renderer, vec[i][0], vec[i][1], 7, color);
 }
 
-
 std::vector <std::vector <int>> parabola(int size_x, int size_y, Point origin, double prec)
 {
     std::vector <std::vector <int>> vec;
@@ -340,12 +339,28 @@ std::vector <std::vector <int>> mnk2(int size_x, int size_y, Point origin, doubl
     return vec;
 }
 
+/* for 4.1 its euler */
 std::vector <std::vector <int>> f_tabular(int size_x, int size_y, Point origin, double prec)
 {
     /* std::vector <std::vector <double>> tabular = {{0, 0}, {1.7, 1.3038}, {3.4, 1.8439}, {5.1, 2.2583}, */
     /*     {6.8, 2.6077}, {8.5, 2.9155}}; */
-    std::vector <std::vector <double>> tabular = {{-5, 2.9442}, {-3, 2.8198}, {-1, 2.3562}, {1, 0.78540}, 
-        {3, 0.32175}, {5, 0.19740}};
+
+    /* std::vector <std::vector <double>> tabular = {{-5, 2.9442}, {-3, 2.8198}, {-1, 2.3562}, {1, 0.78540}, */ 
+    /*     {3, 0.32175}, {5, 0.19740}}; */
+
+    std::vector <std::vector <double>> tabular = 
+    {{0, 2},
+	{0.1, 2.02},
+	{0.2, 2.0598},
+	{0.3, 2.11857},
+	{0.4, 2.19487},
+	{0.5, 2.28656},
+	{0.6, 2.39085},
+	{0.7, 2.50429},
+	{0.8, 2.62282},
+	{0.9, 2.74188},
+	{1, 2.85653}};
+
     std::vector <std::vector <int>> vec;
     double f;
     int x, y;
@@ -357,6 +372,186 @@ std::vector <std::vector <int>> f_tabular(int size_x, int size_y, Point origin, 
     }
     return vec;
 }
+
+/* for 4.1 its euler */
+std::vector <std::vector <int>> f_tabular_2(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <double>> tabular = 
+	{{0, 2},
+	{0.05, 2.005},
+	{0.1, 2.01499},
+	{0.15, 2.02991},
+	{0.2, 2.04969},
+	{0.25, 2.07418},
+	{0.3, 2.10323},
+	{0.35, 2.13663},
+	{0.4, 2.17413},
+	{0.45, 2.21546},
+	{0.5, 2.26027},
+	{0.55, 2.30821},
+	{0.6, 2.35888},
+	{0.65, 2.41183},
+	{0.7, 2.46659},
+	{0.75, 2.52265},
+	{0.8, 2.57948},
+	{0.85, 2.63651},
+	{0.9, 2.69316},
+	{0.95, 2.74885}};
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> f_tabular_runge(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <double>> tabular = 
+    {{0, 2},
+    {0.1, 2.00998},
+    {0.2, 2.0396},
+    {0.3, 2.08797},
+    {0.4, 2.15357},
+    {0.5, 2.23429},
+    {0.6, 2.32738},
+    {0.7, 2.42957},
+    {0.8, 2.53705},
+    {0.9, 2.64563},
+    {1, 2.75085}};
+
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> f_tabular_runge_2(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <double>> tabular = 
+	{{0, 2},
+	{0.05, 2.0025},
+	{0.1, 2.00997},
+	{0.15, 2.02237},
+	{0.2, 2.0396},
+	{0.25, 2.06152},
+	{0.3, 2.08797},
+	{0.35, 2.11874},
+	{0.4, 2.15357},
+	{0.45, 2.1922},
+	{0.5, 2.23429},
+	{0.55, 2.27948},
+	{0.6, 2.32738},
+	{0.65, 2.37757},
+	{0.7, 2.42957},
+	{0.75, 2.4829},
+	{0.8, 2.53705},
+	{0.85, 2.59147},
+	{0.9, 2.64563},
+	{0.95, 2.69894}};
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+std::vector <std::vector <int>> f_tabular_adams(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <double>> tabular = 
+	{{0, 2},
+	{0.1, 2.00998},
+	{0.2, 2.0396},
+	{0.3, 2.08797},
+	{0.4, 2.15357},
+	{0.5, 2.23428},
+	{0.6, 2.32737},
+	{0.7, 2.42952},
+	{0.8, 2.53694},
+	{0.9, 2.64544},
+	{1, 2.75055}};
+
+
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+std::vector <std::vector <int>> f_tabular_adams_2(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <double>> tabular = 
+	{{0, 2},
+	{0.05, 2.0025},
+	{0.1, 2.00997},
+	{0.15, 2.02237},
+	{0.2, 2.0396},
+	{0.25, 2.06152},
+	{0.3, 2.08797},
+	{0.35, 2.11874},
+	{0.4, 2.15357},
+	{0.45, 2.1922},
+	{0.5, 2.23428},
+	{0.55, 2.27948},
+	{0.6, 2.32738},
+	{0.65, 2.37756},
+	{0.7, 2.42956},
+	{0.75, 2.4829},
+	{0.8, 2.53704},
+	{0.85, 2.59146},
+	{0.9, 2.64561},
+	{0.95, 2.69892}};
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = 0; i < (int)tabular.size(); ++i)
+    {
+        x = size_x - origin.x + (int)std::round(tabular[i][0] * (1 / prec));
+        y = size_y - origin.y - (int)std::round(tabular[i][1] * (1 / prec));
+        vec.push_back({x, y});
+    }
+    return vec;
+}
+
+
+std::vector <std::vector <int>> exact_solution(int size_x, int size_y, Point origin, double prec)
+{
+    std::vector <std::vector <int>> vec;
+    double f;
+    int x, y;
+    for(int i = origin.x - size_x; i < size_x; ++i)
+    {
+        if(i * prec >= 0 && i * prec < 1)
+        {
+            f = std::exp(std::sin(i * prec)) + std::exp(-std::sin(i * prec));
+            x = origin.x + i;
+            y = size_y - origin.y - (int)std::round(f * (1 / prec));
+            vec.push_back({x, y});
+        }
+    }
+    return vec;
+}
+
 
 std::vector <std::vector <int>> qspline1(int size_x, int size_y, Point origin, double prec)
 {
@@ -512,7 +707,11 @@ int main(int argc, char *argv[])
     Color color_s2 = {106, 147, 208};
     Color color_s3 = {55, 139, 64};
     Color color_s4 = {94, 64, 160};
-
+    
+    Color eu_color = {102, 232, 237}; // euler method
+    Color exact_color = {237, 188, 102}; // exact solution
+    Color runge_color = {255, 0, 0}; // exact solution
+    Color adams_color = {0, 255, 0}; // exact solution
 
     Color coord_color = {2, 0, 200};
 
@@ -562,17 +761,30 @@ int main(int argc, char *argv[])
                 /* draw(renderer, sin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
                 /* draw(renderer, asin(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color); */
 
-                // draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f1);
-                // draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f2);
+                /* draw(renderer, f1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f1); */
+                /* draw(renderer, f2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_f2); */
 
-                draw(renderer, qspline1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s1);
-                draw(renderer, qspline2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s2);
-                draw(renderer, qspline3(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s3);
-                draw(renderer, qspline4(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s4);
+                /* draw(renderer, qspline1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s1); */
+                /* draw(renderer, qspline2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s2); */
+                /* draw(renderer, qspline3(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s3); */
+                /* draw(renderer, qspline4(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_s4); */
 
-                // draw(renderer, mnk1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk1);
-                // draw(renderer, mnk2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk2);
-                // draw_tabular(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_tabular);
+                /* draw(renderer, mnk1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk1); */
+                /* draw(renderer, mnk2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_mnk2); */
+                /* draw_tabular(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, color_tabular); */
+
+
+                /* 4.1 */
+                draw(renderer, f_tabular(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color);
+                draw(renderer, f_tabular_runge(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color);
+                draw(renderer, f_tabular_adams(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, adams_color);
+
+                draw(renderer, f_tabular_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color);
+                draw(renderer, f_tabular_runge_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color);
+                draw(renderer, f_tabular_adams_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, adams_color);
+
+                draw(renderer, exact_solution(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, exact_color);
+
 
                 /* draw(renderer, ellipse(size_x, size_y, point, (1 / (mult * 100)), a, b), size_x, size_y, color); */
 
