@@ -4,7 +4,6 @@ set output 'equations.png'                # Output file name
 set xrange [-5:5]
 set yrange [-5:5]
 
-# Define equations
 f(x) = acos(x - 2)
 g(x) = sin(x) + 2
 

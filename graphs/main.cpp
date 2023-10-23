@@ -936,13 +936,13 @@ int main(int argc, char *argv[])
 
                 /* ------------- */
                 /* 4.2 */
-                draw(renderer, f_tabular_shooting_1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color);
-                draw(renderer, f_tabular_fd_1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color);
+                /* draw(renderer, f_tabular_shooting_1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color); */
+                /* draw(renderer, f_tabular_fd_1(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color); */
 
-                draw(renderer, f_tabular_shooting_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color);
-                draw(renderer, f_tabular_fd_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color);
+                /* draw(renderer, f_tabular_shooting_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, eu_color); */
+                /* draw(renderer, f_tabular_fd_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, runge_color); */
 
-                draw(renderer, exact_solution_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, exact_color);
+                /* draw(renderer, exact_solution_2(size_x, size_y, point, (1 / (mult * 100))), size_x, size_y, exact_color); */
                 /* ------------- */
 
 
